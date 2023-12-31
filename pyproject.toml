@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "syuichi"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+Django = "^5.0"
+djangorestframework = "^3.14.0"
+Markdown = "^3.5.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
