@@ -9,6 +9,9 @@ services:
       - "8000:8000"
     volumes:
       - ./syuichi:/usr/src/app/backend/syuichi
+      - ./pyproject.toml:/usr/src/app/backend/pyproject.toml
+      - ./poetry.lock:/usr/src/app/backend/poetry.lock
+      - ./requirements.txt:/usr/src/app/backend/requirements.txt
     env_file:
       - .env
     depends_on:
