@@ -1,12 +1,14 @@
 version: '3.7'
 services:
   backend:
-    build: ./backend
+    build: 
+      context: .
+      dockerfile: ./syuichi/Dockerfile
     stop_signal: SIGINT
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/usr/src/app/backend
+      - ./syuichi:/usr/src/app/backend/syuichi
     env_file:
       - .env
     depends_on:
@@ -27,11 +29,11 @@ services:
       timeout: 5s
       retries: 5
   frontend:
-    build: ./frontend
+    build: .
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend:/app
+      - ./:/app
       - /app/node_modules
     init: true
 

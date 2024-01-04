@@ -1,0 +1,8 @@
+{
+    "name": "backend",
+    "dockerComposeFile": ["../docker-compose.yaml"],
+    "service": "backend",
+    "shutdownAction": "none",
+    "workspaceFolder": "/usr/src/app/backend",
+    "remoteUser": "nonroot"
+}
