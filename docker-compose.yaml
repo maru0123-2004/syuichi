@@ -12,6 +12,7 @@ services:
       - ./pyproject.toml:/usr/src/app/backend/pyproject.toml
       - ./poetry.lock:/usr/src/app/backend/poetry.lock
       - ./requirements.txt:/usr/src/app/backend/requirements.txt
+      - /var/run/docker.sock:/var/run/docker.sock
     env_file:
       - .env
     depends_on:
