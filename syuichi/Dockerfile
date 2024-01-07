@@ -12,9 +12,10 @@ COPY pyproject.toml ./
 COPY poetry.lock ./
 COPY manage.py ./
 
-RUN poetry install --no-cache
+RUN poetry install --no-cache --no-root --with postgres
 
 USER root
+ENV DJANGO_DEBUG=1
 EXPOSE 8000
 ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
-CMD  poetry run python manage.py runserver
+CMD  poetry run python manage.py migrate && poetry run python manage.py runserver
