@@ -20,4 +20,4 @@ RUN python3 -c "from urllib.request import urlretrieve; urlretrieve('https://dow
 ENV DJANGO_DEBUG=1
 EXPOSE 8000
 ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
-CMD  poetry run python manage.py migrate && poetry run python manage.py runserver
+CMD  poetry run python manage.py migrate && poetry run python manage.py runserver 0.0.0.0:8000
