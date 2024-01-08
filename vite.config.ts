@@ -49,6 +49,7 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: "syuichi/static/"
+    outDir: "syuichi/templates/",
+    emptyOutDir: true,
   },
 })
