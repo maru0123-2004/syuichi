@@ -16,6 +16,10 @@ const routes = [
       },
     ],
   },
+  {
+    path: '/workspace',
+    component: () => import('@/views/WorkspaceEditor.vue')
+  }
 ]
 
 const router = createRouter({
