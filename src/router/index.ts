@@ -18,7 +18,7 @@ const routes = [
   },
   {
     path: '/workspace',
-    component: () => import('@/views/WorkspaceEditor.vue')
+    component: () => import('@/views/Workspace.vue')
   }
 ]
 

@@ -8,7 +8,7 @@
 
 <script lang="ts" setup>
 const onDragStart = (e: DragEvent) => {
-    const serverType = e.target?.type
+    const serverType = e.target?.dataset.type
     e.dataTransfer?.setData("text/plain", serverType)
 
     e.target.style.opacity = "0.5"
@@ -25,7 +25,7 @@ const onDragEnd = (e: DragEvent) => {
     height: 100%;
     display: flex;
     border: 2px black solid;
-    margin: 6px;
+    box-sizing: border-box;
 }
 
 #server {
