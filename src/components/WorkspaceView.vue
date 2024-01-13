@@ -3,40 +3,27 @@
     @dragover="onDragOver" @drop="onDrop">
         <v-stage :config="myState.stageConfig">
             <v-layer ref="layer">
-                <v-group  v-for="server in servers" :key="server.id"
-                :config="{
-                    x: server.x,
-                    y: server.y,
-                    draggable: true
-                }">
-                    <v-rect :config="{
-                        width: 50,
-                        height: 50,
-                        fill: 'black'
-                    }"></v-rect>
-                    <v-text :config="{
-                        x: 0,
-                        y: 60,
-                        width: 50,
-                        text: server.id,
-                        align: 'center'
-                    }">
-                    </v-text>
-                </v-group>
+                <ComponentMachine v-for="(machine, key) in machines" :key="key"
+                v-model="machines[key]"/>
+                <ComponentNetwork v-for="(network, key) in networks" :key="key"
+                v-model="networks[key]"/>
             </v-layer>
         </v-stage>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { reactive, computed, ref, watch } from 'vue'
-import { Layer } from 'konva/lib/Layer';
-import { Server } from '../models/Server.ts'
+import { reactive, computed, ref } from 'vue'
+import { Machine } from '../models/Machine'
+import { Network } from '../models/Network'
+import ComponentMachine from './ComponentMachine.vue'
+import ComponentNetwork from './ComponentNetwork.vue';
 
 const view = ref<HTMLElement>()
 
-const serverCount = new Map<string, number>()
-const servers = reactive(new Array<Server>())
+const machineCount = new Map<string, number>()
+const machines = reactive(new Array<Machine>())
+const networks = reactive(new Array<Network>())
 
 const myState = reactive({
     stageConfig: computed(() => {
@@ -48,8 +35,8 @@ const myState = reactive({
 })
 
 function getServerId(serverType: string) {
-    const id = serverCount.get(serverType) ?? 1
-    serverCount.set(serverType, id + 1)
+    const id = machineCount.get(serverType) ?? 1
+    machineCount.set(serverType, id + 1)
     return id
 }
 
@@ -65,11 +52,19 @@ const onDrop = (e: DragEvent) => {
         return
     }
 
-    const serverId = serverType + getServerId(serverType)
-    let server = new Server(serverId)
-    server.x = e.clientX - 25
-    server.y = e.clientY - 25
-    servers.push(server)
+    if(serverType == "NETWORK") {
+        let network = new Network("a");
+        network.x = e.clientX - 25
+        network.y = e.clientY - 25
+        networks.push(network)
+    }
+    else {
+        const serverId = serverType + getServerId(serverType)
+        let server = new Machine(serverId)
+        server.x = e.clientX - 25
+        server.y = e.clientY - 25
+        machines.push(server)
+    }
 }
 </script>
 

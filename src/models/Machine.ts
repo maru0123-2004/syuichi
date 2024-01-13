@@ -1,4 +1,4 @@
-export class Server {
+export class Machine {
     id: string
 
     x: number = 0
