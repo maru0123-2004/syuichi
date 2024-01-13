@@ -2,13 +2,13 @@ from django.contrib.auth.models import Group, User
 from .models import Machine
 from rest_framework import serializers
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['url', 'username', 'email', 'groups']
 
 
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
+class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ['url', 'name']
@@ -16,7 +16,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 import docker
 docker_client = docker.from_env()
 
-class MachineSerializer(serializers.HyperlinkedModelSerializer):
+class MachineSerializer(serializers.ModelSerializer):
     class Meta:
         model = Machine
         fields = '__all__'
