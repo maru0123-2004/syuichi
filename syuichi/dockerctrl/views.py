@@ -1,16 +1,12 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-
-
-def index(request):
-    return HttpResponse("Hello, world. You're at the polls index.")
-
-
 from django.contrib.auth.models import Group, User
 from rest_framework import permissions, viewsets
+from rest_framework.response import Response
 
-from .serializers import GroupSerializer, UserSerializer
+import docker
+docker_client = docker.from_env()
 
+from .serializers import GroupSerializer, UserSerializer, MachineSerializer
+from .models import Machine
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -28,3 +24,18 @@ class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+class MachineViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows machines to be viewed or edited.
+    """
+    queryset = Machine.objects.all()
+    serializer_class = MachineSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    def update(self, request, *args, **kwargs):
+        return Response("error: not impd", status=404)
+    def partial_update(self, request, *args, **kwargs):
+        return Response("error: not impd", status=404)
+    def destroy(self, request, *args, **kwargs):
+        docker_client.containers.get(Machine.objects.get(id=kwargs['pk']).container_id).remove(v=True, force=True)
+        return super().destroy(request, *args, **kwargs)
