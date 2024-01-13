@@ -37,5 +37,9 @@ class MachineViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         return Response("error: not impd", status=404)
     def destroy(self, request, *args, **kwargs):
-        docker_client.containers.get(Machine.objects.get(id=kwargs['pk']).container_id).remove(v=True, force=True)
-        return super().destroy(request, *args, **kwargs)
+        machine=Machine.objects.get(id=kwargs['pk'])
+        if machine.owner==request.user:
+            docker_client.containers.get(machine.container_id).remove(v=True, force=True)
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response("error: permission denied", status=400)
