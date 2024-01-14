@@ -4,6 +4,8 @@ export class Machine {
     x: number = 0
     y: number = 0
 
+    nets = new Array<string>
+
     constructor(id: string) {
         this.id = id
     }
