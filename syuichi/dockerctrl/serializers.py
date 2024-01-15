@@ -1,5 +1,5 @@
 from django.contrib.auth.models import Group, User
-from .models import Machine
+from .models import Machine, Network
 from rest_framework import serializers
 
 class UserSerializer(serializers.ModelSerializer):
@@ -32,3 +32,9 @@ class MachineSerializer(serializers.ModelSerializer):
         machine=Machine(**data, container_id=str(container.id), owner=self.context["request"].user)
         machine.save()
         return machine
+
+class NetworkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Network
+        fields = '__all__'
+        read_only_fields = ['network_id', 'owner']

@@ -14,3 +14,19 @@ class Machine(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=300, default='')
     owner = models.ForeignKey(User, related_name='machines', on_delete=models.CASCADE)
+
+class Network(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    network_id = models.CharField(max_length=100)
+    network = models.GenericIPAddressField()
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=300, default='')
+    owner = models.ForeignKey(User, related_name='networks', on_delete=models.CASCADE)
+    machines = models.ManyToManyField(Machine, related_name="networks", through="Port")
+
+class Port(models.Model):
+    ip_addr = models.GenericIPAddressField()
+    machine = models.ForeignKey(Machine, related_name="ports", on_delete=models.CASCADE)
+    network = models.ForeignKey(Network, related_name="ports", on_delete=models.CASCADE)
+    class Meta:
+       unique_together = ('network', 'machine')

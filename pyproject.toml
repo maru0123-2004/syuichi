@@ -13,6 +13,7 @@ djangorestframework = "^3.14.0"
 Markdown = "^3.5.1"
 django-environ = "^0.11.2"
 docker = "^7.0.0"
+python-powerdns = "^2.1.0"
 
 [tool.poetry.group.postgres.dependencies]
 psycopg2-binary = "^2.9.9"

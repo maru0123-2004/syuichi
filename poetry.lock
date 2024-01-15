@@ -318,6 +318,16 @@ files = [
 ]
 
 [[package]]
+name = "python-powerdns"
+version = "2.1.0"
+description = "PowerDNS web api python client and interface"
+optional = false
+python-versions = "*"
+files = [
+    {file = "python-powerdns-2.1.0.tar.gz", hash = "sha256:da2c7eafdc1c22d6739af51c696499edce5802608099a6b6ad05b1c9e10b3478"},
+]
+
+[[package]]
 name = "pytz"
 version = "2023.3.post1"
 description = "World timezone definitions, modern and historical"
@@ -429,4 +439,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "8dd1c2e0244689aa4cb469cfc65672bf35867824e521d53d7c35e033908ee73f"
+content-hash = "6a4875ab31aa4b2290df6eb4c9fe3a5b0b19ce48b09666d7f747a722590db4a7"

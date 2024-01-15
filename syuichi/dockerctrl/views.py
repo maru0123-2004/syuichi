@@ -5,8 +5,8 @@ from rest_framework.response import Response
 import docker
 docker_client = docker.from_env()
 
-from .serializers import GroupSerializer, UserSerializer, MachineSerializer
-from .models import Machine
+from .serializers import GroupSerializer, NetworkSerializer, UserSerializer, MachineSerializer
+from .models import Machine, Network
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -43,3 +43,12 @@ class MachineViewSet(viewsets.ModelViewSet):
             return super().destroy(request, *args, **kwargs)
         else:
             return Response("error: permission denied", status=400)
+
+class NetworkViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows networks to be viewed or edited.
+    """
+    queryset = Network.objects.all()
+    serializer_class = NetworkSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
