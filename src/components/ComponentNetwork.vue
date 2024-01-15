@@ -27,4 +27,16 @@ import { Network } from '../models/Network'
 const model = defineModel<Network>({ required: true })
 
 const SIZE = 50
+
+const getConnectionPos = (x: number, y: number) => {
+    const px = x - model.value.x
+    const py = y - model.value.y
+    const s = Math.sqrt(px * px + py * py)
+    const radius = SIZE / 2
+    return [px / s * radius, py / s * radius]
+}
+
+defineExpose({
+    getConnectionPos
+})
 </script>
