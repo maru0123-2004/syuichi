@@ -50,6 +50,9 @@ INSTALLED_APPS = [
     'rest_framework',
 ]
 
+if DEBUG:
+    INSTALLED_APPS.append("django_watchfiles")
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

@@ -18,6 +18,10 @@ python-powerdns = "^2.1.0"
 [tool.poetry.group.postgres.dependencies]
 psycopg2-binary = "^2.9.9"
 
+
+[tool.poetry.group.dev.dependencies]
+django-watchfiles = "^0.1.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
