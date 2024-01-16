@@ -51,3 +51,9 @@ class NetworkSerializer(serializers.ModelSerializer):
         network=Network(**data, network_id=str(network.id), owner=self.context["request"].user, gateway=gateway)
         network.save()
         return network
+
+class DettachNetworkSerializer(serializers.Serializer):
+    network_id=serializers.PrimaryKeyRelatedField(queryset=Network.objects.all())
+
+class AttachNetworkSerializer(DettachNetworkSerializer):
+    ipaddr=serializers.IPAddressField()

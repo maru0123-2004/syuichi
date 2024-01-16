@@ -6,7 +6,7 @@ class Machine(models.Model):
     class MachineType(models.TextChoices):
         WEB_SERVER = "WEB"
         DNS_SERVER = "DNS"
-        DHCP_SERVER = "DHCP"
+        SMTP_SERVER = "SMTP"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     container_id = models.CharField(max_length=100)
