@@ -13,7 +13,7 @@ class GroupSerializer(serializers.ModelSerializer):
         model = Group
         fields = ['url', 'name']
 
-import docker
+import docker, docker.types, ipaddress
 docker_client = docker.from_env()
 
 class MachineSerializer(serializers.ModelSerializer):
@@ -37,4 +37,17 @@ class NetworkSerializer(serializers.ModelSerializer):
     class Meta:
         model = Network
         fields = '__all__'
-        read_only_fields = ['network_id', 'owner']
+        read_only_fields = ['network_id', 'owner', 'gateway']
+    def create(self, data):
+        gateway=format(list(ipaddress.ip_network(data["network"]).hosts())[-1])
+        ipam_config=docker.types.IPAMConfig(pool_configs=[
+            docker.types.IPAMPool(
+                subnet=format(data["network"]),
+                iprange=format(data["network"]),
+                gateway=gateway
+            )
+        ])
+        network=docker_client.networks.create(name=data["name"], enable_ipv6=data["network"].version==6, driver="bridge", ipam=ipam_config)
+        network=Network(**data, network_id=str(network.id), owner=self.context["request"].user, gateway=gateway)
+        network.save()
+        return network

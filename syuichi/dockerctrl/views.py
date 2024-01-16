@@ -51,4 +51,16 @@ class NetworkViewSet(viewsets.ModelViewSet):
     queryset = Network.objects.all()
     serializer_class = NetworkSerializer
     permission_classes = [permissions.IsAuthenticated]
+    def update(self, request, *args, **kwargs):
+        return Response("error: not impd", status=404)
+    def partial_update(self, request, *args, **kwargs):
+        return Response("error: not impd", status=404)
+    def destroy(self, request, *args, **kwargs):
+        network=Network.objects.get(id=kwargs['pk'])
+        if network.owner==request.user:
+            docker_client.networks.get(network.network_id).remove()
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response("error: permission denied", status=400)
+    
     
