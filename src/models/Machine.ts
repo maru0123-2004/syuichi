@@ -6,6 +6,8 @@ export class Machine {
 
     nets = new Array<string>
 
+    highlighted: boolean = false
+
     constructor(id: string) {
         this.id = id
     }

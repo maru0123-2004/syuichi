@@ -1,9 +1,8 @@
 <template>
     <v-group :config="groupConfig"
-    ref="group"
-    @mouseenter="onMouseEnter"
-    @mouseout="onMouseOut"
-    @dragmove="onDragMode">
+    @mouseenter="$emit('selected')"
+    @mouseleave="$emit('unselected')"
+    @dragmove="onDragMove">
         <v-rect :config="{
             width: SIZE,
             height: SIZE,
@@ -15,56 +14,66 @@
             width: SIZE,
             text: model.id,
             align: 'center'
-        }">
-        </v-text>
+        }"></v-text>
+        <v-circle v-if="model.highlighted" :config="{
+            x: SIZE / 2,
+            y: SIZE / 2,
+            radius: SIZE / 1.5,
+            stroke: '#00000',
+            opacity: 0.5,
+            strokeWidth: 3
+        }"></v-circle>
     </v-group>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { Machine } from '../models/Machine'
-import { watch } from 'vue';
-import { onMounted } from 'vue';
+import { readonly } from 'vue';
 
-const model = defineModel({ type: Machine, required: true })
+const model = defineModel<Machine>({ required: true })
+
+const emits = defineEmits<{
+    selected: [],
+    unselected: []
+}>()
 
 const SIZE = 50
-
-const group = ref()
 
 const groupConfig = computed(() => {
     return {
         x: model.value.x,
         y: model.value.y,
+        width: SIZE,
+        height: SIZE,
         draggable: true
     }
 })
 
-const centerX = ref(model.value.x + SIZE / 2)
-const centerY = ref(model.value.y + SIZE / 2)
+const centerX = readonly(computed(() => {
+    return model.value.x + SIZE / 2
+}))
 
-const onMouseEnter = (e: unknown) => {
-    console.log(e)
-}
+const centerY = readonly(computed(() => {
+    return model.value.y + SIZE / 2
+}))
 
-const onMouseOut = (e: unknown) => {
-    console.log(e)
-}
-
-const onDragMode = (e: unknown) => {
+const onDragMove = (e: any) => {
     model.value.x = e.target.x()
+    model.value.y = e.target.y()
 }
 
 const getConnectionPos = (x: number, y: number) => {
     return [
-        model.value.x + SIZE / 2, 
-        model.value.y + SIZE / 2
+        centerX.value,
+        centerY.value
     ]
 }
 
 defineExpose({
     getConnectionPos,
     centerX,
-    centerY
+    centerY,
+    model
 })
 </script>

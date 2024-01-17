@@ -1,9 +1,8 @@
 <template>
-    <v-group :config="{
-        x: model.x,
-        y: model.y,
-        draggable: true
-    }">
+    <v-group :config="groupConfig"
+    @mouseenter="$emit('selected')"
+    @mouseleave="$emit('unselected')"
+    @dragmove="onDragMove">
         <v-circle :config="{
             x: SIZE / 2,
             y: SIZE / 2,
@@ -12,38 +11,64 @@
             strokeWidth: 3
         }"></v-circle>
         <v-text :config="{
-            x: 0,
+            x: -50 + SIZE / 2,
             y: SIZE + 10,
-            width: SIZE,
+            width: 100,
             text: model.id,
             align: 'center'
         }"></v-text>
+        <v-circle v-if="model.highlighted" :config="{
+            x: SIZE / 2,
+            y: SIZE / 2,
+            radius: SIZE / 1.5,
+            stroke: '#00000',
+            opacity: 0.5,
+            strokeWidth: 3
+        }"></v-circle>
     </v-group>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { computed, readonly } from 'vue';
 import { Network } from '../models/Network'
-import { watch } from 'vue';
 
 const model = defineModel<Network>({ required: true })
 
+const emits = defineEmits<{
+    selected: [],
+    unselected: []
+}>()
+
 const SIZE = 50
 
-const centerX = ref(model.value.x + SIZE / 2)
-const centerY = ref(model.value.y + SIZE / 2)
-
-watch(model.value,
-(newVal, oldVal) => {
-    console.log(newVal, oldVal)
+const groupConfig = computed(() => {
+    return {
+        x: model.value.x,
+        y: model.value.y,
+        width: SIZE,
+        height: SIZE,
+        draggable: true
+    }
 })
+
+const centerX = readonly(computed(() => {
+    return model.value.x + SIZE / 2
+}))
+
+const centerY = readonly(computed(() => {
+    return model.value.y + SIZE / 2
+}))
+
+const onDragMove = (e: any) => {
+    model.value.x = e.target.x()
+    model.value.y = e.target.y()
+}
 
 const getConnectionPos = (x: number, y: number) => {
     const px = x - model.value.x
     const py = y - model.value.y
     const s = Math.sqrt(px * px + py * py)
     const radius = SIZE / 2
-    console.log(px, py, s, radius)
     return [
         centerX.value + px / s * radius, 
         centerY.value + py / s * radius
@@ -53,6 +78,7 @@ const getConnectionPos = (x: number, y: number) => {
 defineExpose({
     getConnectionPos,
     centerX,
-    centerY
+    centerY,
+    model
 })
 </script>

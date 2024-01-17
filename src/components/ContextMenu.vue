@@ -1,10 +1,9 @@
 <template>
     <div ref="contextMenuDiv" v-show="isVisible" style="position: absolute;" 
     :style="{ left: offsetX + 'px', top: offsetY + 'px'}"
-    @focusout="console.log('focus out')"
-    @focus="console.log('focus')"
-    @focusin="console.log('focus in')">
-        <v-list>
+    @focus="focusRelated = $event.relatedTarget"
+    @keydown.escape="isVisible = false; backFocus()">
+        <v-list id="list">
             <v-list-item v-for="(item, idx) in props.menu" :key="idx"
             @click="onClick(idx)">
                 <v-list-item-title>{{ item.label }}</v-list-item-title>
@@ -14,6 +13,7 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue';
 import { ref } from 'vue';
 
 const isVisible = ref(false)
@@ -21,6 +21,8 @@ const offsetX = ref(0)
 const offsetY = ref(0)
 
 const contextMenuDiv = ref<HTMLDivElement>()
+
+const focusRelated = ref<EventTarget | null>(null)
 
 const props = defineProps<{
     menu: {
@@ -30,8 +32,10 @@ const props = defineProps<{
 }>()
 
 const onClick = (idx: number) => {
+    (focusRelated.value as HTMLElement).focus()
     isVisible.value = false
-    props.menu[idx].action()
+    setTimeout(props.menu[idx].action, 0)
+    backFocus()
 }
 
 const show = (mouse: MouseEvent) => {
@@ -39,10 +43,25 @@ const show = (mouse: MouseEvent) => {
     offsetX.value = mouse.clientX
     offsetY.value = mouse.clientY
     isVisible.value = true
-    contextMenuDiv.value!.focus()
+    contextMenuDiv.value!.tabIndex = -1
+    setTimeout(() => contextMenuDiv.value!.focus(), 0)
 }
 
+const backFocus = () => {
+    (focusRelated.value as HTMLElement).focus()
+}
+
+const isShowing = computed(() => isVisible)
+
 defineExpose({
-    show
+    show,
+    isShowing
 })
 </script>
+
+<style scoped>
+#list {
+    box-shadow: 0px 0px 6px black;
+    user-select: none;
+}
+</style>
