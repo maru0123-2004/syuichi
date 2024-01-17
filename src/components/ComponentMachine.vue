@@ -1,11 +1,9 @@
 <template>
-    <v-group :config="{
-            x: model.x,
-            y: model.y,
-            draggable: true
-    }"
+    <v-group :config="groupConfig"
+    ref="group"
     @mouseenter="onMouseEnter"
-    @mouseout="onMouseOut">
+    @mouseout="onMouseOut"
+    @dragmove="onDragMode">
         <v-rect :config="{
             width: SIZE,
             height: SIZE,
@@ -23,11 +21,27 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, computed } from 'vue'
 import { Machine } from '../models/Machine'
+import { watch } from 'vue';
+import { onMounted } from 'vue';
 
 const model = defineModel({ type: Machine, required: true })
 
 const SIZE = 50
+
+const group = ref()
+
+const groupConfig = computed(() => {
+    return {
+        x: model.value.x,
+        y: model.value.y,
+        draggable: true
+    }
+})
+
+const centerX = ref(model.value.x + SIZE / 2)
+const centerY = ref(model.value.y + SIZE / 2)
 
 const onMouseEnter = (e: unknown) => {
     console.log(e)
@@ -37,11 +51,20 @@ const onMouseOut = (e: unknown) => {
     console.log(e)
 }
 
+const onDragMode = (e: unknown) => {
+    model.value.x = e.target.x()
+}
+
 const getConnectionPos = (x: number, y: number) => {
-    return [model.value.x, model.value.y]
+    return [
+        model.value.x + SIZE / 2, 
+        model.value.y + SIZE / 2
+    ]
 }
 
 defineExpose({
-    getConnectionPos
+    getConnectionPos,
+    centerX,
+    centerY
 })
 </script>

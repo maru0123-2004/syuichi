@@ -1,14 +1,18 @@
 <template>
     <v-line :config="{
-        fill: 'black',
-        points: points
+        x: 0,
+        y: 0,
+        stroke: 'black',
+        strokeWidth: 3,
+        points: points,
+        tension: 1
     }"></v-line>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import ComponentMachine from './ComponentMachine.vue';
-import ComponentNetwork from './ComponentNetwork.vue';
+import ComponentMachine from './ComponentMachine.vue'
+import ComponentNetwork from './ComponentNetwork.vue'
 
 const props = defineProps<{
     machine: InstanceType<typeof ComponentMachine> | undefined,
@@ -19,10 +23,15 @@ const mx = ref(0)
 const my = ref(0)
 
 const points = computed(() => {
-    const mp = props.machine ? props.machine.getConnectionPos(0, 0) : [mx.value, my.value]
+    // const machinePos = props.machine ? [props.machine.centerX, props.machine.centerY] : [mx.value, my.value]
+    // const networkPos = props.network ? [props.network.centerX, props.network.centerY] : [mx.value, my.value]
+    // return [
+    //     ...(props.machine ? props.machine.getConnectionPos(networkPos[0], networkPos[1]) : [mx.value, my.value]),
+    //     ...(props.network ? props.network.getConnectionPos(machinePos[0], machinePos[1]) : [mx.value, my.value])
+    // ]
     return [
-        ...mp,
-        ...(props.network ? props.network.getConnectionPos(mp[0], mp[1]) : [mx.value, my.value])
+        ...(props.machine ? [props.machine.centerX, props.machine.centerY] : [mx.value, my.value]),
+        ...(props.network ? [props.network.centerX, props.network.centerY] : [mx.value, my.value])
     ]
 })
 

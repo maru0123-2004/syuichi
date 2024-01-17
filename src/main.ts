@@ -13,10 +13,7 @@ import App from './App.vue'
 // Composables
 import { createApp } from 'vue'
 
-import VueKonva from 'vue-konva'
-
 const app = createApp(App)
-app.use(VueKonva)
 
 registerPlugins(app)
 

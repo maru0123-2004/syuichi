@@ -1,12 +1,18 @@
 <template>
     <div id="workspace-view" ref="view"
     @dragover="onDragOver" @drop="onDrop">
-        <v-stage :config="myState.stageConfig" @contextmenu="contextMenu?.show($event.evt)">
+        <v-stage :config="myState.stageConfig" 
+        @contextmenu="contextMenu?.show($event.evt)"
+        @mousemove="networkEdge?.processMouse($event.evt)">
             <v-layer ref="layer">
-                <ComponentMachine v-for="(machine, key) in machines" :key="key"
-                v-model="machines[key]"/>
-                <ComponentNetwork v-for="(network, key) in networks" :key="key"
+                <ComponentMachine v-for="(machine, key) in machines" :key="key" ref="machineComponents"
+                v-model="machines[key].value"
+                @update="console.log($event)"/>
+                <ComponentNetwork v-for="(network, key) in networks" :key="key" ref="networkComponents"
                 v-model="networks[key]"/>
+                <ComponentNetworkEdge ref="networkEdge"
+                :machine="machineComponents?.at(0)"
+                :network="networkComponents?.at(0)"/>
             </v-layer>
         </v-stage>
         <ContextMenu ref="contextMenu" :menu="menu" />
@@ -14,18 +20,22 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, computed, ref } from 'vue'
+import { reactive, computed, ref, Ref } from 'vue'
 import { Machine } from '../models/Machine'
 import { Network } from '../models/Network'
 import ComponentMachine from './ComponentMachine.vue'
 import ComponentNetwork from './ComponentNetwork.vue'
 import ContextMenu from './ContextMenu.vue'
+import ComponentNetworkEdge from './ComponentNetworkEdge.vue'
 
 const view = ref<HTMLElement>()
 const contextMenu = ref<InstanceType<typeof ContextMenu>>()
+const networkEdge = ref<InstanceType<typeof ComponentNetworkEdge>>()
+const machineComponents = ref<any[]>()
+const networkComponents = ref()
 
 const machineCount = new Map<string, number>()
-const machines = reactive(new Array<Machine>())
+const machines = reactive(new Array<Ref<Machine>>())
 const networks = reactive(new Array<Network>())
 
 const menu = reactive([
@@ -81,7 +91,7 @@ const onDrop = (e: DragEvent) => {
         let server = new Machine(serverId)
         server.x = e.clientX - 25
         server.y = e.clientY - 25
-        machines.push(server)
+        machines.push(ref(server))
     }
 }
 </script>
