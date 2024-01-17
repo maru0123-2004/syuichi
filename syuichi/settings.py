@@ -51,7 +51,7 @@ INSTALLED_APPS = [
 ]
 
 if DEBUG:
-    INSTALLED_APPS.append("django_watchfiles")
+    INSTALLED_APPS.extend(["django_watchfiles", 'drf_spectacular'])
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -136,10 +136,16 @@ STATICFILES_DIRS = (
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-    ]
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Syuichi',
+    'DESCRIPTION': 'Backend API Server of Syuichi Project',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }

@@ -1,0 +1,927 @@
+openapi: 3.0.3
+info:
+  title: Syuichi
+  version: 1.0.0
+  description: Backend API Server of Syuichi Project
+paths:
+  /api/groups/:
+    get:
+      operationId: groups_list
+      description: API endpoint that allows groups to be viewed or edited.
+      tags:
+      - groups
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Group'
+          description: ''
+    post:
+      operationId: groups_create
+      description: API endpoint that allows groups to be viewed or edited.
+      tags:
+      - groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Group'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Group'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+          description: ''
+  /api/groups/{id}/:
+    get:
+      operationId: groups_retrieve
+      description: API endpoint that allows groups to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this group.
+        required: true
+      tags:
+      - groups
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+          description: ''
+    put:
+      operationId: groups_update
+      description: API endpoint that allows groups to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this group.
+        required: true
+      tags:
+      - groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Group'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Group'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+          description: ''
+    patch:
+      operationId: groups_partial_update
+      description: API endpoint that allows groups to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this group.
+        required: true
+      tags:
+      - groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedGroup'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedGroup'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedGroup'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+          description: ''
+    delete:
+      operationId: groups_destroy
+      description: API endpoint that allows groups to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this group.
+        required: true
+      tags:
+      - groups
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/machines/:
+    get:
+      operationId: machines_list
+      description: API endpoint that allows machines to be viewed or edited.
+      tags:
+      - machines
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Machine'
+          description: ''
+    post:
+      operationId: machines_create
+      description: API endpoint that allows machines to be viewed or edited.
+      tags:
+      - machines
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Machine'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Machine'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Machine'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Machine'
+          description: ''
+  /api/machines/{id}/:
+    get:
+      operationId: machines_retrieve
+      description: API endpoint that allows machines to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this machine.
+        required: true
+      tags:
+      - machines
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Machine'
+          description: ''
+    put:
+      operationId: machines_update
+      description: API endpoint that allows machines to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this machine.
+        required: true
+      tags:
+      - machines
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Machine'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Machine'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Machine'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Machine'
+          description: ''
+    patch:
+      operationId: machines_partial_update
+      description: API endpoint that allows machines to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this machine.
+        required: true
+      tags:
+      - machines
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMachine'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMachine'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMachine'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Machine'
+          description: ''
+    delete:
+      operationId: machines_destroy
+      description: API endpoint that allows machines to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this machine.
+        required: true
+      tags:
+      - machines
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/machines/{id}/attach_network/:
+    post:
+      operationId: machines_attach_network_create
+      description: API endpoint that allows machines to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this machine.
+        required: true
+      tags:
+      - machines
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttachNetwork'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AttachNetwork'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AttachNetwork'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttachNetwork'
+          description: ''
+  /api/machines/{id}/dettach_network/:
+    post:
+      operationId: machines_dettach_network_create
+      description: API endpoint that allows machines to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this machine.
+        required: true
+      tags:
+      - machines
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DettachNetwork'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DettachNetwork'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DettachNetwork'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DettachNetwork'
+          description: ''
+  /api/networks/:
+    get:
+      operationId: networks_list
+      description: API endpoint that allows networks to be viewed or edited.
+      tags:
+      - networks
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Network'
+          description: ''
+    post:
+      operationId: networks_create
+      description: API endpoint that allows networks to be viewed or edited.
+      tags:
+      - networks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Network'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Network'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Network'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Network'
+          description: ''
+  /api/networks/{id}/:
+    get:
+      operationId: networks_retrieve
+      description: API endpoint that allows networks to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this network.
+        required: true
+      tags:
+      - networks
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Network'
+          description: ''
+    put:
+      operationId: networks_update
+      description: API endpoint that allows networks to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this network.
+        required: true
+      tags:
+      - networks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Network'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Network'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Network'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Network'
+          description: ''
+    patch:
+      operationId: networks_partial_update
+      description: API endpoint that allows networks to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this network.
+        required: true
+      tags:
+      - networks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedNetwork'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedNetwork'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedNetwork'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Network'
+          description: ''
+    delete:
+      operationId: networks_destroy
+      description: API endpoint that allows networks to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this network.
+        required: true
+      tags:
+      - networks
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/users/:
+    get:
+      operationId: users_list
+      description: API endpoint that allows users to be viewed or edited.
+      tags:
+      - users
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+          description: ''
+    post:
+      operationId: users_create
+      description: API endpoint that allows users to be viewed or edited.
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/{id}/:
+    get:
+      operationId: users_retrieve
+      description: API endpoint that allows users to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: users_update
+      description: API endpoint that allows users to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: users_partial_update
+      description: API endpoint that allows users to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: users_destroy
+      description: API endpoint that allows users to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    AttachNetwork:
+      type: object
+      properties:
+        network_id:
+          type: string
+          format: uuid
+        ipaddr:
+          type: string
+      required:
+      - ipaddr
+      - network_id
+    DettachNetwork:
+      type: object
+      properties:
+        network_id:
+          type: string
+          format: uuid
+      required:
+      - network_id
+    Group:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+      required:
+      - name
+      - url
+    Machine:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        container_id:
+          type: string
+          readOnly: true
+        machine_type:
+          $ref: '#/components/schemas/MachineTypeEnum'
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 300
+        owner:
+          type: integer
+          readOnly: true
+      required:
+      - container_id
+      - id
+      - machine_type
+      - name
+      - owner
+    MachineTypeEnum:
+      enum:
+      - WEB
+      - DNS
+      - SMTP
+      type: string
+      description: |-
+        * `WEB` - Web Server
+        * `DNS` - Dns Server
+        * `SMTP` - Smtp Server
+    Network:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        network_id:
+          type: string
+          readOnly: true
+        network:
+          type: string
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 300
+        gateway:
+          type: string
+          readOnly: true
+        owner:
+          type: integer
+          readOnly: true
+        machines:
+          type: array
+          items:
+            type: string
+            format: uuid
+          readOnly: true
+      required:
+      - gateway
+      - id
+      - machines
+      - name
+      - network
+      - network_id
+      - owner
+    PatchedGroup:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+    PatchedMachine:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        container_id:
+          type: string
+          readOnly: true
+        machine_type:
+          $ref: '#/components/schemas/MachineTypeEnum'
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 300
+        owner:
+          type: integer
+          readOnly: true
+    PatchedNetwork:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        network_id:
+          type: string
+          readOnly: true
+        network:
+          type: string
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 300
+        gateway:
+          type: string
+          readOnly: true
+        owner:
+          type: integer
+          readOnly: true
+        machines:
+          type: array
+          items:
+            type: string
+            format: uuid
+          readOnly: true
+    PatchedUser:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        groups:
+          type: array
+          items:
+            type: integer
+          description: The groups this user belongs to. A user will get all permissions
+            granted to each of their groups.
+    User:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        groups:
+          type: array
+          items:
+            type: integer
+          description: The groups this user belongs to. A user will get all permissions
+            granted to each of their groups.
+      required:
+      - url
+      - username
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
