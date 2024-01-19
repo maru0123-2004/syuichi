@@ -2,7 +2,7 @@
     <div id="workspace-view" ref="view" tabindex="1"
     @dragover="onDragOver" @drop="onDrop"
     @keydown.escape="deleteConnectingNetworkEdge">
-        <v-stage :config="myState.stageConfig" 
+        <v-stage :config="stageConfig" 
         @contextmenu="onContextMenu($event.evt)"
         @mousemove="onMouseMove($event.evt)"
         @click="onClickStage($event.evt)">
@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, computed, ref, Ref } from 'vue'
+import { reactive, computed, ref, Ref, onMounted } from 'vue'
 import { Machine } from '../models/Machine'
 import { Network } from '../models/Network'
 import { NetworkEdge } from '../models/NetworkEdge'
@@ -36,7 +36,6 @@ import ContextMenu from './ContextMenu.vue'
 import ComponentMachine from './ComponentMachine.vue'
 import ComponentNetwork from './ComponentNetwork.vue'
 import ComponentNetworkEdge from './ComponentNetworkEdge.vue'
-import { onMounted } from 'vue'
 
 type CompMachine = InstanceType<typeof ComponentMachine>
 type CompNetwork = InstanceType<typeof ComponentNetwork>
@@ -58,18 +57,21 @@ const networkEdges = ref(new Array<Ref<NetworkEdge>>())
 const connectingNetworkEdge = ref<NetworkEdge>()
 const mouseX = ref(0)
 const mouseY = ref(0)
+const stageConfig = ref({
+    width: view.value?.clientWidth,
+    height: view.value?.clientHeight
+})
 
 onMounted(() => {
     focus()
-})
-
-const myState = reactive({
-    stageConfig: computed(() => {
-        return {
-            width: view.value?.clientWidth,
-            height: view.value?.clientHeight
-        }
+    const resizeObserver = new ResizeObserver(()=>{
+        stageConfig.value.height = view.value?.clientHeight
+        stageConfig.value.width = view.value?.clientWidth
+        console.log(stageConfig.value)
     })
+    if (view.value){
+        resizeObserver.observe(view.value)
+    }
 })
 
 function getServerId(serverType: string) {
