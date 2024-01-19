@@ -64,7 +64,7 @@ class MachineViewSet(viewsets.ModelViewSet):
             return Response("error: network_id is not given", status=400)
         machine=Machine.objects.get(id=pk)
         network=Network.objects.get(id=request.data["network_id"])
-        network.machines.remove(network)
+        network.machines.remove(machine)
         network.save()
         docker_client.networks.get(network.network_id).disconnect(machine.container_id, force=True)
         return Response("success", status=200)
