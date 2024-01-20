@@ -14,7 +14,7 @@
             x: -50 + SIZE / 2,
             y: SIZE + 10,
             width: 100,
-            text: model.id,
+            text: model.refdata.name,
             align: 'center'
         }"></v-text>
         <v-circle v-if="model.highlighted" :config="{

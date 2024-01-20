@@ -1,44 +1,53 @@
-import { MachinesService, MachineTypeEnum } from "@/client"
+import { Machine as MachineAPI, MachineTypeEnum as MachineTypeEnumAPI, MachinesService } from "@/client"
+import { Network } from "./Network"
 
-export type MachineType = "WEB" | "SMTP" | "DNS"
+export type MachineTypeEnum = MachineTypeEnumAPI
+export const MachineType = MachineTypeEnumAPI
 
 export class Machine {
-    readonly id: string
-    readonly container_id: string
-    readonly owner: number
-
-    name = ""
-    type: MachineType = "WEB"
+    refdata: MachineAPI
 
     x: number = 0
     y: number = 0
     highlighted: boolean = false
 
-    constructor(id: string, containerId: string, owner: number) {
-        this.id = id
-        this.container_id = containerId
-        this.owner = owner
+    private constructor(refdata: MachineAPI) {
+        this.refdata = refdata
     }
 
-    static getMachines() {
-        return MachinesService.machinesList().then((machines) => {
-            return machines.map(x => {
-                const machine = new Machine(x.id, x.container_id, x.owner)
-                machine.name = x.name
-                machine.type = this.fromAPIType(x.machine_type)
-                return machine
-            })
+    async destroy() {
+        await MachinesService.machinesDestroy(this.refdata.id)
+    }
+
+    async attachNetwork(net: Network, addr: string) {
+        await MachinesService.machinesAttachNetworkCreate(this.refdata.id, {
+            network_id: net.refdata.id,
+            ipaddr: addr
         })
     }
 
-    static fromAPIType(type: MachineTypeEnum): MachineType {
-        switch(type) {
-            case MachineTypeEnum.DNS:
-                return "DNS"
-            case MachineTypeEnum.SMTP:
-                return "SMTP"
-            case MachineTypeEnum.WEB:
-                return "WEB"
-        }
+    async detachNetwork(net: Network) {
+        await MachinesService.machinesDettachNetworkCreate(this.refdata.id, {
+            network_id: net.refdata.id
+        })
+    }
+
+    static async create(type: MachineTypeEnum, name: string, description?: string) {
+        const machineApi = await MachinesService.machinesCreate({
+            id: "",
+            container_id: "",
+            owner: 0,
+            machine_type: type,
+            name: name,
+            description: description
+        })
+        return new Machine(machineApi)
+    }
+
+    static async list() {
+        const machines = await MachinesService.machinesList()
+        return machines.map((machine) => {
+            return new Machine(machine)
+        })
     }
 }

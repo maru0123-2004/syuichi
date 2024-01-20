@@ -12,11 +12,11 @@
                 :machine="getMachineComponent(edge.value.machineId)"
                 :mouse-x="mouseX"
                 :mouse-y="mouseY"/>
-                <ComponentMachine v-for="(machine, index) in machines" :key="machine.value.id" ref="machineComponents"
+                <ComponentMachine v-for="(machine, index) in machines" :key="machine.value.refdata.id" ref="machineComponents"
                 v-model="machines[index].value"
                 @selected="onComponentSelected(machines[index].value)"
                 @unselected="onComponentUnselected(machines[index].value)"/>
-                <ComponentNetwork v-for="(network, index) in networks" :key="index" ref="networkComponents"
+                <ComponentNetwork v-for="(network, index) in networks" :key="network.value.refdata.id" ref="networkComponents"
                 v-model="networks[index].value"
                 @selected="onComponentSelected(networks[index].value)"
                 @unselected="onComponentUnselected(networks[index].value)"/>
@@ -28,7 +28,7 @@
 
 <script lang="ts" setup>
 import { reactive, computed, ref, Ref, onMounted } from 'vue'
-import { Machine } from '../models/Machine'
+import { Machine, MachineType } from '../models/Machine'
 import { Network } from '../models/Network'
 import { NetworkEdge } from '../models/NetworkEdge'
 
@@ -87,27 +87,25 @@ const onDragOver = (e: DragEvent) => {
 const onDrop = (e: DragEvent) => {
     e.preventDefault()
     const serverType = e.dataTransfer?.getData("text/plain")
-    console.log(serverType)
     if(!serverType) {
         return
     }
 
     if(serverType == "NETWORK") {
-        let network = new Network("192.168." + networkCount.value + ".0", 
-            Network.numberIPv4([192, 168, networkCount.value, 0]), 
-            Network.numberIPv4([255, 255, 255, 0])
-        );
-        network.x = e.clientX - 25
-        network.y = e.clientY - 25
-        networks.value.push(ref(network))
-        networkCount.value++
+        Network.create("192.168." + networkCount.value + ".0/24", "Network " + networkCount.value).then((network) => {
+            network.x = e.clientX - 25
+            network.y = e.clientY - 25
+            networks.value.push(ref(network))
+            networkCount.value++
+        })
     }
     else {
-        const serverId = serverType + getServerId(serverType)
-        let server = new Machine(serverId)
-        server.x = e.clientX - 25
-        server.y = e.clientY - 25
-        machines.value.push(ref(server))
+        const machineType = MachineType.WEB
+        Machine.create(machineType, "WEB Server " + getServerId("WEB")).then((machine) => {
+            machine.x = e.clientX - 25
+            machine.y = e.clientY - 25
+            machines.value.push(ref(machine))
+        })
     }
 }
 
@@ -130,10 +128,10 @@ const onClickConnectNetwork = () => {
         }
         const networkEdge = ref(new NetworkEdge())
         if(selectedComponent.value instanceof Machine) {
-            networkEdge.value.machineId = selectedComponent.value.id
+            networkEdge.value.machineId = selectedComponent.value.refdata.id
         }
         else if(selectedComponent.value instanceof Network) {
-            networkEdge.value.networkId = selectedComponent.value.id
+            networkEdge.value.networkId = selectedComponent.value.refdata.id
         }
         networkEdges.value.push(networkEdge)
         connectingNetworkEdge.value = networkEdge.value
@@ -145,12 +143,14 @@ const onClickConnectNetwork = () => {
 const onClickDeleteComponent = () => {
     if(selectedComponent.value) {
         if(selectedComponent.value instanceof Machine) {
-            machines.value = machines.value.filter(x => x.value.id != selectedComponent.value?.id)
-            networkEdges.value = networkEdges.value.filter(x => x.value.machineId != selectedComponent.value?.id)
+            machines.value = machines.value.filter(x => x.value.refdata.id != selectedComponent.value?.refdata.id)
+            networkEdges.value = networkEdges.value.filter(x => x.value.machineId != selectedComponent.value?.refdata.id)
+            selectedComponent.value.destroy()
         }
         else if(selectedComponent.value instanceof Network) {
-            networks.value = networks.value.filter(x => x.value.id != selectedComponent.value?.id)
-            networkEdges.value = networkEdges.value.filter(x => x.value.networkId != selectedComponent.value?.id)
+            networks.value = networks.value.filter(x => x.value.refdata.id != selectedComponent.value?.refdata.id)
+            networkEdges.value = networkEdges.value.filter(x => x.value.networkId != selectedComponent.value?.refdata.id)
+            selectedComponent.value.destroy()
         }
     }
 }
@@ -175,11 +175,11 @@ const onClickStage = (e: MouseEvent) => {
     if(e.button == 0) {
         if(connectingNetworkEdge.value && selectedComponent.value ) {
             if(connectingNetworkEdge.value.machineId && selectedComponent.value instanceof Network) {
-                connectingNetworkEdge.value.networkId = selectedComponent.value.id
+                connectingNetworkEdge.value.networkId = selectedComponent.value.refdata.id
                 connectingNetworkEdge.value = undefined
             }
             else if(connectingNetworkEdge.value.networkId && selectedComponent.value instanceof Machine) {
-                connectingNetworkEdge.value.machineId = selectedComponent.value.id
+                connectingNetworkEdge.value.machineId = selectedComponent.value.refdata.id
                 connectingNetworkEdge.value = undefined
             }
         }
@@ -200,11 +200,11 @@ const deleteConnectingNetworkEdge = () => {
 }
 
 const getMachineComponent = (id: string | undefined) => {
-    return machineComponents.value.find((x) => x.model.id == id)
+    return machineComponents.value.find((x) => x.model.refdata.id == id)
 }
 
 const getNetworkComponent = (id: string | undefined) => {
-    return networkComponents.value.find((x) => x.model.id == id)
+    return networkComponents.value.find((x) => x.model.refdata.id == id)
 }
 
 const menu = reactive([
