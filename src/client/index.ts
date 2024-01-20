@@ -8,6 +8,7 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { AttachNetwork } from './models/AttachNetwork';
+export type { AuthToken } from './models/AuthToken';
 export type { DettachNetwork } from './models/DettachNetwork';
 export type { Group } from './models/Group';
 export type { Machine } from './models/Machine';
@@ -22,4 +23,5 @@ export type { User } from './models/User';
 export { GroupsService } from './services/GroupsService';
 export { MachinesService } from './services/MachinesService';
 export { NetworksService } from './services/NetworksService';
+export { TokenService } from './services/TokenService';
 export { UsersService } from './services/UsersService';
