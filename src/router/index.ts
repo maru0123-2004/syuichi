@@ -18,6 +18,7 @@ const routes = [
   },
   {
     path: '/workspace',
+    name: 'Workspace',
     component: () => import('@/views/Workspace.vue')
   }
 ]
