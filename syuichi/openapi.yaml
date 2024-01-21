@@ -12,7 +12,7 @@ paths:
       - groups
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '200':
           content:
@@ -41,7 +41,7 @@ paths:
         required: true
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '201':
           content:
@@ -64,7 +64,7 @@ paths:
       - groups
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '200':
           content:
@@ -98,7 +98,7 @@ paths:
         required: true
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '200':
           content:
@@ -131,7 +131,7 @@ paths:
               $ref: '#/components/schemas/PatchedGroup'
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '200':
           content:
@@ -153,7 +153,7 @@ paths:
       - groups
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '204':
           description: No response body
@@ -165,7 +165,7 @@ paths:
       - machines
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '200':
           content:
@@ -194,7 +194,7 @@ paths:
         required: true
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '201':
           content:
@@ -218,7 +218,7 @@ paths:
       - machines
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '200':
           content:
@@ -253,7 +253,7 @@ paths:
         required: true
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '200':
           content:
@@ -287,7 +287,7 @@ paths:
               $ref: '#/components/schemas/PatchedMachine'
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '200':
           content:
@@ -310,7 +310,7 @@ paths:
       - machines
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '204':
           description: No response body
@@ -342,7 +342,7 @@ paths:
         required: true
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '200':
           content:
@@ -378,7 +378,7 @@ paths:
         required: true
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '200':
           content:
@@ -394,7 +394,7 @@ paths:
       - networks
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '200':
           content:
@@ -423,7 +423,7 @@ paths:
         required: true
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '201':
           content:
@@ -447,7 +447,7 @@ paths:
       - networks
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '200':
           content:
@@ -482,7 +482,7 @@ paths:
         required: true
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '200':
           content:
@@ -516,7 +516,7 @@ paths:
               $ref: '#/components/schemas/PatchedNetwork'
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '200':
           content:
@@ -539,7 +539,7 @@ paths:
       - networks
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '204':
           description: No response body
@@ -562,7 +562,7 @@ paths:
         required: true
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '200':
           content:
@@ -578,7 +578,7 @@ paths:
       - users
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '200':
           content:
@@ -607,7 +607,7 @@ paths:
         required: true
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '201':
           content:
@@ -630,7 +630,7 @@ paths:
       - users
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '200':
           content:
@@ -664,7 +664,7 @@ paths:
         required: true
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '200':
           content:
@@ -697,7 +697,7 @@ paths:
               $ref: '#/components/schemas/PatchedUser'
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '200':
           content:
@@ -719,7 +719,7 @@ paths:
       - users
       security:
       - basicAuth: []
-      - cookieAuth: []
+      - tokenAuth: []
       responses:
         '204':
           description: No response body
@@ -791,6 +791,16 @@ components:
         description:
           type: string
           maxLength: 300
+        x:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        y:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
         owner:
           type: integer
           readOnly: true
@@ -876,6 +886,16 @@ components:
         description:
           type: string
           maxLength: 300
+        x:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        y:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
         owner:
           type: integer
           readOnly: true
@@ -964,7 +984,8 @@ components:
     basicAuth:
       type: http
       scheme: basic
-    cookieAuth:
+    tokenAuth:
       type: apiKey
-      in: cookie
-      name: sessionid
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"

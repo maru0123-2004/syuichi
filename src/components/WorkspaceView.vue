@@ -67,7 +67,6 @@ onMounted(() => {
     const resizeObserver = new ResizeObserver(()=>{
         stageConfig.value.height = view.value?.clientHeight
         stageConfig.value.width = view.value?.clientWidth
-        console.log(stageConfig.value)
     })
     if (view.value){
         resizeObserver.observe(view.value)

@@ -37,11 +37,10 @@ const username = ref("")
 const passwd = ref("")
 
 onMounted(async ()=>{
-    try{
-        await MachinesService.machinesList()
-        router.push("Workspace")
-    } catch (e) {
-        console.log(e)
+    if ("Authorization" in (OpenAPI.HEADERS??{})){
+        if(OpenAPI.HEADERS??{Authorization:''}.Authorization){
+            router.push("Workspace")
+        }
     }
 })
 
