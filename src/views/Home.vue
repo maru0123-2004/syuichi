@@ -37,8 +37,11 @@ const username = ref("")
 const passwd = ref("")
 
 onMounted(async ()=>{
-    if (await MachinesService.machinesList()){
+    try{
+        await MachinesService.machinesList()
         router.push("Workspace")
+    } catch (e) {
+        console.log(e)
     }
 })
 
