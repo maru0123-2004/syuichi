@@ -102,9 +102,15 @@ class NetworkViewSet(viewsets.ModelViewSet):
     serializer_class = NetworkSerializer
     permission_classes = [permissions.IsAuthenticated]
     def update(self, request, *args, **kwargs):
-        return Response("error: not impd", status=404)
+        for key in request.data:
+            if key not in ["x", "y"]:
+                return Response(f"error: can't change {key}", status=404)
+        return super().update(request, *args, **kwargs)
     def partial_update(self, request, *args, **kwargs):
-        return Response("error: not impd", status=404)
+        for key in request.data:
+            if key not in ["x", "y"]:
+                return Response(f"error: can't change {key}", status=404)
+        return super().partial_update(request, *args, **kwargs)
     def destroy(self, request, *args, **kwargs):
         network=Network.objects.get(id=kwargs['pk'])
         if network.owner==request.user:

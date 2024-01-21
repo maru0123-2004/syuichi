@@ -841,6 +841,16 @@ components:
         gateway:
           type: string
           readOnly: true
+        x:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        y:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
         owner:
           type: integer
           readOnly: true
@@ -920,6 +930,16 @@ components:
         gateway:
           type: string
           readOnly: true
+        x:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        y:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
         owner:
           type: integer
           readOnly: true

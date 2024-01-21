@@ -26,6 +26,8 @@ class Network(models.Model):
     gateway = netfields.InetAddressField()
     owner = models.ForeignKey(User, related_name='networks', on_delete=models.CASCADE)
     machines = models.ManyToManyField(Machine, related_name="networks", through="Port")
+    x = models.BigIntegerField(default=0)
+    y = models.BigIntegerField(default=0)
 
 class Port(models.Model):
     ip_addr = models.GenericIPAddressField()

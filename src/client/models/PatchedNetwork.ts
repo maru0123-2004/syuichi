@@ -9,6 +9,8 @@ export type PatchedNetwork = {
     name?: string;
     description?: string;
     readonly gateway?: string;
+    'x'?: number;
+    'y'?: number;
     readonly owner?: number;
     readonly machines?: Array<string>;
 };
