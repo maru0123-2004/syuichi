@@ -53,12 +53,12 @@ class MachineViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     def update(self, request, *args, **kwargs):
         for key in request.data:
-            if key not in ["x", "y"]:
+            if key not in ["x", "y", "name", "description"]:
                 return Response(f"error: can't change {key}", status=404)
         return super().update(request, *args, **kwargs)
     def partial_update(self, request, *args, **kwargs):
         for key in request.data:
-            if key not in ["x", "y"]:
+            if key not in ["x", "y", "name", "description"]:
                 return Response(f"error: can't change {key}", status=404)
         return super().partial_update(request, *args, **kwargs)
     def destroy(self, request, *args, **kwargs):
@@ -112,12 +112,12 @@ class NetworkViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     def update(self, request, *args, **kwargs):
         for key in request.data:
-            if key not in ["x", "y"]:
+            if key not in ["x", "y", "name", "description"]:
                 return Response(f"error: can't change {key}", status=404)
         return super().update(request, *args, **kwargs)
     def partial_update(self, request, *args, **kwargs):
         for key in request.data:
-            if key not in ["x", "y"]:
+            if key not in ["x", "y", "name", "description"]:
                 return Response(f"error: can't change {key}", status=404)
         return super().partial_update(request, *args, **kwargs)
     def destroy(self, request, *args, **kwargs):

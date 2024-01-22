@@ -5,8 +5,6 @@
     @dragmove="onDragMove"
     @dragend="onDragEnd">
         <v-text :config="{
-            width: SIZE,
-            height: SIZE,
             fontFamily: 'Material Design Icons',
             fontSize: SIZE,
             text: String.fromCodePoint(components[model.refdata.machine_type].iconCode)
