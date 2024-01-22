@@ -24,7 +24,7 @@ const props = defineProps<{
 const points = computed(() => {
     const mx = props.mouseX
     const my = props.mouseY
-    const machinePos = props.machine ? [props.machine.centerX, props.machine.centerY] : [mx, my]
+    const machinePos = props.machine ? [props.machine.model.x, props.machine.centerY] : [mx, my]
     const networkPos = props.network ? [props.network.centerX, props.network.centerY] : [mx, my]
     return [
         ...(props.machine ? props.machine.getConnectionPos(networkPos[0], networkPos[1]) : [mx, my]),

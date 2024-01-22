@@ -5,7 +5,7 @@ const KEY_AUTHORIZATION = "Authorization"
 
 export async function checkAuthorized() {
     if(!OpenAPI.HEADERS ||
-        KEY_AUTHORIZATION in OpenAPI.HEADERS
+        !(KEY_AUTHORIZATION in OpenAPI.HEADERS)
     ) {
         return false
     }

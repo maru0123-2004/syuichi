@@ -4,12 +4,35 @@ import { Network } from "./Network"
 export class Machine {
     refdata: MachineAPI
 
-    x: number = 0
-    y: number = 0
     highlighted: boolean = false
+
+    get x() {
+        return this.refdata.x ?? 0
+    }
+
+    set x(value: number) {
+        this.refdata.x = value
+    }
+
+    get y() {
+        return this.refdata.y ?? 0
+    }
+
+    set y(value: number) {
+        this.refdata.y = value
+    }
 
     private constructor(refdata: MachineAPI) {
         this.refdata = refdata
+    }
+
+    async save() {
+        await MachinesService.machinesUpdate(this.refdata.container_id, {
+            // name: this.refdata.name,
+            // description: this.refdata.description,
+            x: this.refdata.x,
+            y: this.refdata.y
+        } as MachineAPI)
     }
 
     async destroy() {
@@ -29,15 +52,14 @@ export class Machine {
         })
     }
 
-    static async create(type: MachineTypeEnumAPI, name: string, description?: string) {
+    static async create(type: MachineTypeEnumAPI, name: string, description?: string, x?: number, y?: number) {
         const machineApi = await MachinesService.machinesCreate({
-            id: "",
-            container_id: "",
-            owner: 0,
             machine_type: type,
             name: name,
-            description: description
-        })
+            description: description,
+            x: x,
+            y: y
+        } as MachineAPI)
         return new Machine(machineApi)
     }
 

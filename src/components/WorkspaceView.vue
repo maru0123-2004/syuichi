@@ -1,12 +1,12 @@
 <template>
     <div id="workspace-view" ref="view" tabindex="1"
-    @dragover="onDragOver" @drop="onDrop"
-    @keydown.escape="deleteConnectingNetworkEdge">
-        <v-stage :config="stageConfig" 
+    @dragover="onDragOver($event)" @drop="onDrop"
+    @keydown.escape="deleteConnectingNetworkEdge"
+    @mousemove="onMouseMove($event)">
+        <v-stage ref="stageComponent" :config="stageConfig"
         @contextmenu="onContextMenu($event.evt)"
-        @mousemove="onMouseMove($event.evt)"
         @click="onClickStage($event.evt)">
-            <v-layer ref="layer">
+            <v-layer>
                 <ComponentNetworkEdge v-for="(edge, index) in networkEdges" :key="index" ref="networkEdgeComponents"
                 :network="getNetworkComponent(edge.value.networkId)"
                 :machine="getMachineComponent(edge.value.machineId)"
@@ -29,7 +29,8 @@
 <script lang="ts" setup>
 import { reactive, ref, Ref, onMounted } from 'vue'
 import router from '@/router'
-import { MachineTypeEnum, OpenAPI } from '@/client'
+import { MachineTypeEnum } from '@/client'
+import { Stage } from 'konva/lib/Stage'
 
 import { Machine } from '../models/Machine'
 import { Network } from '../models/Network'
@@ -47,6 +48,7 @@ type CompNetworkEdge = InstanceType<typeof ComponentNetworkEdge>
 type CompContextMenu = InstanceType<typeof ContextMenu>
 
 const view = ref<HTMLElement>()
+const stageComponent = ref<{getStage(): Stage}>()
 const contextMenu = ref<CompContextMenu>()
 const machineComponents = ref(Array<CompMachine>())
 const networkComponents = ref(Array<CompNetwork>())
@@ -66,7 +68,8 @@ const mouseData = ref({
 
 const stageConfig = ref({
     width: view.value?.clientWidth,
-    height: view.value?.clientHeight
+    height: view.value?.clientHeight,
+    // draggable: true
 })
 
 onMounted(async () => {
@@ -79,8 +82,9 @@ onMounted(async () => {
         resizeObserver.observe(view.value)
     }
 
-    if(await loadFromCookie() && await checkAuthorized()) {
+    if(!(await loadFromCookie()) || !(await checkAuthorized())) {
         router.push("/")
+        return
     }
 
     loadWorkspace()
@@ -88,6 +92,7 @@ onMounted(async () => {
 
 const onDragOver = (e: DragEvent) => {
     e.preventDefault()
+    onMouseMove(e)
 }
 
 const onDrop = (e: DragEvent) => {
@@ -97,11 +102,14 @@ const onDrop = (e: DragEvent) => {
         return
     }
 
+    const stage = stageComponent.value?.getStage()
+
+    const x = mouseData.value.offsetX - (stage?.x() ?? 0)
+    const y = mouseData.value.offsetY - (stage?.y() ?? 0)
+
     if(serverType == "NETWORK") {
         const network = findUnusedNetworkAddress()
-        Network.create(network, "Network " + network).then((network) => {
-            network.x = e.clientX - 25
-            network.y = e.clientY - 25
+        Network.create(network, "Network " + network, undefined, x, y).then((network) => {
             networks.value.push(ref(network))
         })
     }
@@ -113,9 +121,7 @@ const onDrop = (e: DragEvent) => {
         const type = serverType as MachineTypeEnum
         const name = findMachineName(type)
         console.log(type, name)
-        Machine.create(type, name).then((machine) => {
-            machine.x = e.clientX - 25
-            machine.y = e.clientY - 25
+        Machine.create(type, name, undefined, x, y).then((machine) => {
             machines.value.push(ref(machine))
         })
     }

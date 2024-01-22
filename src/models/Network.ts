@@ -4,12 +4,23 @@ import { NetworkEdge } from "./NetworkEdge"
 export class Network {
     refdata: NetworkAPI
 
-    name = ""
-    description = ""
-
-    x: number = 0
-    y: number = 0
     highlighted: boolean = false
+
+    get x() {
+        return this.refdata.x ?? 0
+    }
+
+    set x(value: number) {
+        this.refdata.x = value
+    }
+
+    get y() {
+        return this.refdata.y ?? 0
+    }
+
+    set y(value: number) {
+        this.refdata.y = value
+    }
 
     private constructor(refdata: NetworkAPI) {
         this.refdata = refdata
@@ -21,21 +32,28 @@ export class Network {
         })
     }
 
+    async save() {
+        await NetworksService.networksUpdate(this.refdata.network_id, {
+            // network: this.refdata.network,
+            // name: this.refdata.name,
+            // description: this.refdata.description,
+            x: this.refdata.x,
+            y: this.refdata.y
+        } as NetworkAPI)
+    }
+
     async destroy() {
         await NetworksService.networksDestroy(this.refdata.id)
     }
 
-    static async create(networkCIDR: string, name: string, description?: string) {
+    static async create(networkCIDR: string, name: string, description?: string, x?: number, y?: number) {
         const networkApi = await NetworksService.networksCreate({
-            id: "",
-            network_id: "",
-            gateway: "",
-            owner: 0,
-            machines: [],
             network: networkCIDR,
             name: name,
-            description: description
-        })
+            description: description,
+            x: x,
+            y: y
+        } as NetworkAPI)
         return new Network(networkApi)
     }
 

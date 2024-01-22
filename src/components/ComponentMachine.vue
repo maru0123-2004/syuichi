@@ -2,7 +2,8 @@
     <v-group :config="groupConfig"
     @mouseenter="$emit('selected')"
     @mouseleave="$emit('unselected')"
-    @dragmove="onDragMove">
+    @dragmove="onDragMove"
+    @dragend="onDragEnd">
         <v-rect :config="{
             width: SIZE,
             height: SIZE,
@@ -12,7 +13,7 @@
             x: 0,
             y: SIZE + 10,
             width: SIZE,
-            text: model.refdata.name,
+            text: model.refdata.name.replaceAll('_', ' '),
             align: 'center'
         }"></v-text>
         <v-circle v-if="model.highlighted" :config="{
@@ -40,10 +41,13 @@ const emits = defineEmits<{
 
 const SIZE = 50
 
+const x = model.value.refdata.x ?? 0
+const y = model.value.refdata.y ?? 0
+
 const groupConfig = computed(() => {
     return {
-        x: model.value.x,
-        y: model.value.y,
+        x: x - SIZE / 2,
+        y: y - SIZE / 2,
         width: SIZE,
         height: SIZE,
         draggable: true
@@ -51,16 +55,20 @@ const groupConfig = computed(() => {
 })
 
 const centerX = readonly(computed(() => {
-    return model.value.x + SIZE / 2
+    return model.value.x
 }))
 
 const centerY = readonly(computed(() => {
-    return model.value.y + SIZE / 2
+    return model.value.y
 }))
 
 const onDragMove = (e: any) => {
-    model.value.x = e.target.x()
-    model.value.y = e.target.y()
+    model.value.x = e.target.x() + SIZE / 2
+    model.value.y = e.target.y() + SIZE / 2
+}
+
+const onDragEnd = (e: any) => {
+    model.value.save()
 }
 
 const getConnectionPos = (x: number, y: number) => {

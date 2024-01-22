@@ -2,7 +2,8 @@
     <v-group :config="groupConfig"
     @mouseenter="$emit('selected')"
     @mouseleave="$emit('unselected')"
-    @dragmove="onDragMove">
+    @dragmove="onDragMove"
+    @dragend="onDragEnd">
         <v-circle :config="{
             x: SIZE / 2,
             y: SIZE / 2,
@@ -43,8 +44,8 @@ const SIZE = 50
 
 const groupConfig = computed(() => {
     return {
-        x: model.value.x,
-        y: model.value.y,
+        x: (model.value.refdata.x ?? 0) - SIZE / 2,
+        y: (model.value.refdata.y ?? 0) - SIZE / 2,
         width: SIZE,
         height: SIZE,
         draggable: true
@@ -52,16 +53,20 @@ const groupConfig = computed(() => {
 })
 
 const centerX = readonly(computed(() => {
-    return model.value.x + SIZE / 2
+    return model.value.x
 }))
 
 const centerY = readonly(computed(() => {
-    return model.value.y + SIZE / 2
+    return model.value.y
 }))
 
 const onDragMove = (e: any) => {
-    model.value.x = e.target.x()
-    model.value.y = e.target.y()
+    model.value.x = e.target.x() + SIZE / 2
+    model.value.y = e.target.y() + SIZE / 2
+}
+
+const onDragEnd = (e: any) => {
+    model.value.save()
 }
 
 const getConnectionPos = (x: number, y: number) => {
