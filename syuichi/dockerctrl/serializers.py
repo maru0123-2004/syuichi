@@ -23,10 +23,11 @@ class MachineSerializer(serializers.ModelSerializer):
         read_only_fields = ['container_id', 'owner']
     def create(self, data):
         machine_type=data["machine_type"]
+        kwargs={"name":data["name"], "detach":True, "publish_all_ports":True}
         if machine_type==Machine.MachineType.WEB_SERVER:
-            container=docker_client.containers.run("litespeedtech/litespeed:latest", name=data["name"], detach=True)
+            container=docker_client.containers.run("litespeedtech/openlitespeed:latest", **kwargs)
         elif machine_type==Machine.MachineType.DNS_SERVER:
-            container=docker_client.containers.run("powerdns/pdns-auth-48:latest", name=data["name"], detach=True)
+            container=docker_client.containers.run("powerdns/pdns-auth-48:latest", **kwargs)
         else:
             raise ValueError
         machine=Machine(**data, container_id=str(container.id), owner=self.context["request"].user)

@@ -75,6 +75,8 @@ class MachineViewSet(viewsets.ModelViewSet):
         if "ipaddr" not in request.data:
             return Response("error: ipaddr is not given", status=400)
         machine=Machine.objects.get(id=pk)
+        if machine.owner!=request.user:
+            return Response("error: permission denied", status=403)
         network=Network.objects.get(id=request.data["network_id"])
         Port(ip_addr=request.data["ipaddr"], network=network, machine=machine).save()
         ip_version=ipaddress.ip_address(request.data["ipaddr"]).version
@@ -87,6 +89,8 @@ class MachineViewSet(viewsets.ModelViewSet):
         if "network_id" not in request.data:
             return Response("error: network_id is not given", status=400)
         machine=Machine.objects.get(id=pk)
+        if machine.owner!=request.user:
+            return Response("error: permission denied", status=403)
         network=Network.objects.get(id=request.data["network_id"])
         network.machines.remove(machine)
         network.save()
