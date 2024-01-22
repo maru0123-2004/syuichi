@@ -13,7 +13,7 @@
             x: 0,
             y: SIZE + 10,
             width: SIZE,
-            text: model.refdata.name.replaceAll('_', ' '),
+            text: model.refdata.name,
             align: 'center'
         }"></v-text>
         <v-circle v-if="model.highlighted" :config="{

@@ -362,7 +362,7 @@ const loadWorkspace = async () => {
 const findMachineName = (type: MachineTypeEnum) => {
     let i = 1
     do {
-        const nameCandidate = type + "_Server_" + i
+        const nameCandidate = type + " Server " + i
         if(machines.value.every((machine) => {
             return nameCandidate != machine.value.refdata.name
         })) {

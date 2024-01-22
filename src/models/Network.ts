@@ -35,8 +35,8 @@ export class Network {
     async save() {
         await NetworksService.networksPartialUpdate(this.refdata.id, {
             // network: this.refdata.network,
-            // name: this.refdata.name,
-            // description: this.refdata.description,
+            name: this.refdata.name,
+            description: this.refdata.description,
             x: this.refdata.x,
             y: this.refdata.y
         } as NetworkAPI)
