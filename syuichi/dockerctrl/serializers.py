@@ -20,7 +20,7 @@ class MachineSerializer(serializers.ModelSerializer):
     class Meta:
         model = Machine
         fields = '__all__'
-        read_only_fields = ['container_id', 'owner']
+        read_only_fields = ['container_id', 'owner', 'confdata']
     def create(self, data):
         machine_type=data["machine_type"]
         kwargs={"detach":True, "publish_all_ports":True}
