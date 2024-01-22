@@ -233,9 +233,14 @@ const onClickDeleteComponent = () => {
         }
         else if(selectedComponent.value instanceof Network) {
             const comp = selectedComponent.value
-            networks.value = networks.value.filter(x => x.value.refdata.id != comp.refdata.id)
-            networkEdges.value = networkEdges.value.filter(x => x.value.networkId != comp.refdata.id)
-            comp.destroy()
+            Promise.all(networkEdges.value
+                .filter(x => x.value.networkId == comp.refdata.id && x.value.machineId)
+                .map(x => machines.value.find(m => m.value.refdata.id == x.value.machineId!)!.value.detachNetwork(networks.value.find(n => n.value.refdata.id == x.value.networkId!)?.value!))
+            ).then(() => {
+                networks.value = networks.value.filter(x => x.value.refdata.id != comp.refdata.id)
+                networkEdges.value = networkEdges.value.filter(x => x.value.networkId != comp.refdata.id)
+                comp.destroy()
+            })
         }
         else if(selectedComponent.value instanceof NetworkEdge) {
             const networkId = selectedComponent.value.networkId ?? ""
@@ -245,7 +250,7 @@ const onClickDeleteComponent = () => {
             if(network?.value && machine?.value) {
                 machine.value.detachNetwork(network.value)
             }
-            networkEdges.value = networkEdges.value.filter(x => x.value.networkId != networkId && x.value.machineId != machineId)
+            networkEdges.value = networkEdges.value.filter(x => x.value.networkId != networkId || x.value.machineId != machineId)
         }
         selectedComponent.value = undefined
     }

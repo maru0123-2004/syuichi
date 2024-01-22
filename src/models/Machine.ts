@@ -1,4 +1,4 @@
-import { Machine as MachineAPI, MachineTypeEnum as MachineTypeEnumAPI, MachinesService } from "@/client"
+import { AttachNetwork, Machine as MachineAPI, MachineTypeEnum as MachineTypeEnumAPI, MachinesService } from "@/client"
 import { Network } from "./Network"
 
 export class Machine {
@@ -39,11 +39,11 @@ export class Machine {
         await MachinesService.machinesDestroy(this.refdata.id)
     }
 
-    async attachNetwork(net: Network, addr: string) {
+    async attachNetwork(net: Network, addr?: string) {
         await MachinesService.machinesAttachNetworkCreate(this.refdata.id, {
             network_id: net.refdata.id,
             ipaddr: addr
-        })
+        } as AttachNetwork)
     }
 
     async detachNetwork(net: Network) {

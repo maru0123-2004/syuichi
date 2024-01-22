@@ -73,9 +73,13 @@ const onDragEnd = (e: any) => {
 }
 
 const getConnectionPos = (x: number, y: number) => {
+    const px = x - model.value.x
+    const py = y - model.value.y
+    const s = Math.sqrt(px * px + py * py)
+    const radius = SIZE / 2
     return [
-        centerX.value,
-        centerY.value
+        centerX.value + px / s * radius, 
+        centerY.value + py / s * radius
     ]
 }
 
