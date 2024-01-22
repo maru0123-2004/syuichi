@@ -50,7 +50,7 @@ def get_available_network(network_id):
     hosts=list(map(str, network_addr.hosts()))
     used_hosts=map(lambda p:p.ip_addr, Port.objects.filter(network=network))
     for used_host in used_hosts: hosts.remove(used_host)
-    return Response(hosts, status=200)
+    return hosts
 
 class MachineViewSet(viewsets.ModelViewSet):
     """
@@ -86,6 +86,9 @@ class MachineViewSet(viewsets.ModelViewSet):
         if machine.owner!=request.user:
             return Response("error: permission denied", status=403)
         network=Network.objects.get(id=request.data["network_id"])
+        if not request.data.get("ipaddr", None):
+            print(get_available_network(network.id))
+            request.data["ipaddr"]=get_available_network(network.id)[0]
         port=Port(ip_addr=request.data["ipaddr"], network=network, machine=machine)
         port.save()
         ip_version=ipaddress.ip_address(request.data["ipaddr"]).version
@@ -151,4 +154,4 @@ class NetworkViewSet(viewsets.ModelViewSet):
             return Response("error: permission denied", status=403)
     @action(detail=True, methods=["get"], url_name="dnsconfig", serializer_class=serializers.Serializer)
     def available(self, request, pk=None):
-        return get_available_network(pk)
+        return Response(get_available_network(pk), status=200)
