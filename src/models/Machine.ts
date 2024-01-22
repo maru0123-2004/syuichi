@@ -29,7 +29,7 @@ export class Machine {
     async save() {
         await MachinesService.machinesPartialUpdate(this.refdata.id, {
             name: this.refdata.name,
-            description: this.refdata.description,
+            description: this.refdata.description == "" ? undefined : this.refdata.description,
             x: this.refdata.x,
             y: this.refdata.y
         } as MachineAPI)
