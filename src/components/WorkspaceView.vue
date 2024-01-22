@@ -5,7 +5,8 @@
     @mousemove="onMouseMove($event)">
         <v-stage ref="stageComponent" :config="stageConfig"
         @contextmenu="onContextMenu($event.evt)"
-        @click="onClickStage($event.evt)">
+        @click="onClickStage($event.evt)"
+        @dblclick="onDoubleClick">
             <v-layer>
                 <ComponentNetworkEdge v-for="(edge, index) in networkEdges" :key="index" ref="networkEdgeComponents"
                 :network="getNetworkComponent(edge.value.networkId)"
@@ -23,6 +24,7 @@
             </v-layer>
         </v-stage>
         <ContextMenu ref="contextMenu" :menu="menu" />
+        <WorkspaceSettingDialog ref="settingDialogComponent" v-model="showingSettingDialog"/>
     </div>
 </template>
 
@@ -41,11 +43,14 @@ import ComponentMachine from './ComponentMachine.vue'
 import ComponentNetwork from './ComponentNetwork.vue'
 import ComponentNetworkEdge from './ComponentNetworkEdge.vue'
 import { checkAuthorized, loadFromCookie } from '@/utils/AuthUtils'
+import WorkspaceSettingDialog from './WorkspaceSettingDialog.vue'
+import { server, toEditorSettings } from 'typescript'
 
 type CompMachine = InstanceType<typeof ComponentMachine>
 type CompNetwork = InstanceType<typeof ComponentNetwork>
 type CompNetworkEdge = InstanceType<typeof ComponentNetworkEdge>
 type CompContextMenu = InstanceType<typeof ContextMenu>
+type CompSettingDialog = InstanceType<typeof WorkspaceSettingDialog>
 
 const view = ref<HTMLElement>()
 const stageComponent = ref<{getStage(): Stage}>()
@@ -53,12 +58,15 @@ const contextMenu = ref<CompContextMenu>()
 const machineComponents = ref(Array<CompMachine>())
 const networkComponents = ref(Array<CompNetwork>())
 const networkEdgeComponents = ref(Array<CompNetworkEdge>())
+const settingDialogComponent = ref<CompSettingDialog>()
 
 const selectedComponent = ref<Machine | Network>()
 const machines = ref(new Array<Ref<Machine>>())
 const networks = ref(new Array<Ref<Network>>())
 const networkEdges = ref(new Array<Ref<NetworkEdge>>())
 const connectingNetworkEdge = ref<NetworkEdge>()
+const showingSettingDialog = ref(false)
+
 const mouseData = ref({
     offsetX: 0,
     offsetY: 0,
@@ -104,13 +112,42 @@ const onDrop = (e: DragEvent) => {
 
     const stage = stageComponent.value?.getStage()
 
+    showingSettingDialog.value = true
+
     const x = mouseData.value.offsetX - (stage?.x() ?? 0)
     const y = mouseData.value.offsetY - (stage?.y() ?? 0)
 
     if(serverType == "NETWORK") {
         const network = findUnusedNetworkAddress()
-        Network.create(network, "Network " + network, undefined, x, y).then((network) => {
-            networks.value.push(ref(network))
+        settingDialogComponent.value?.setItems([
+            {
+                label: "ネットワーク名",
+                id: "name",
+                type: "string",
+            },
+            {
+                label: "ネットワークアドレス",
+                id: "network",
+                type: "string",
+            },
+            {
+                label: "説明",
+                id: "description",
+                type: "string"
+            },
+        ])
+        settingDialogComponent.value?.setValue({
+            network: network,
+            name: "Network " + network
+        })
+        settingDialogComponent.value?.setTitle("ネットワークを作成")
+        settingDialogComponent.value?.show((result: any) => {
+            const netaddr = result["network"]
+            const name = result["name"]
+            const description = result["description"] == "" ? undefined : result["description"]
+            Network.create(netaddr, name, description, x, y).then((network) => {
+                networks.value.push(ref(network))
+            })  
         })
     }
     else if(
@@ -118,11 +155,36 @@ const onDrop = (e: DragEvent) => {
         serverType == MachineTypeEnum.DNS ||
         serverType == MachineTypeEnum.SMTP
     ) {
-        const type = serverType as MachineTypeEnum
-        const name = findMachineName(type)
-        console.log(type, name)
-        Machine.create(type, name, undefined, x, y).then((machine) => {
-            machines.value.push(ref(machine))
+        settingDialogComponent.value?.setItems([
+            {
+                label: "サーバー名",
+                id: "name",
+                type: "string"
+            },
+            {
+                label: "サーバータイプ",
+                id: "type",
+                type: "enum",
+                enumSelects: ["WEB", "DNS", "SMTP"]
+            },
+            {
+                label: "説明",
+                id: "description",
+                type: "string"
+            },
+        ])
+        settingDialogComponent.value?.setValue({
+            type: serverType,
+            name: findMachineName(serverType)
+        })
+        settingDialogComponent.value?.setTitle(serverType + "サーバーを作成")
+        settingDialogComponent.value?.show((result: any) => {
+            const type = result["type"]
+            const name = result["name"]
+            const description = result["description"] == "" ? undefined : result["description"]
+            Machine.create(type, name, description, x, y).then((machine) => {
+                machines.value.push(ref(machine))
+            })  
         })
     }
 }
@@ -302,6 +364,57 @@ const findUnusedNetworkAddress = () => {
         }
 
         i++
+    }
+}
+
+const onDoubleClick = (e: any) => {
+    if(selectedComponent.value) {
+        if(selectedComponent.value instanceof Machine) {
+            const comp = selectedComponent.value
+            settingDialogComponent.value?.setTitle("サーバー設定")
+            settingDialogComponent.value?.setItems([
+                {
+                    label: "サーバー名",
+                    id: "name",
+                    type: "string",
+                    defaultValue: comp.refdata.name
+                },
+                {
+                    label: "説明",
+                    id: "description",
+                    type: "string",
+                    defaultValue: comp.refdata.description
+                }
+            ])
+            settingDialogComponent.value?.show((result: any) => {
+                comp.refdata.name = result["name"]
+                comp.refdata.description = result["description"] == "" ? undefined : result["description"]
+                comp.save()
+            })
+        }
+        else if(selectedComponent.value instanceof Network) {
+            const comp = selectedComponent.value
+            settingDialogComponent.value?.setTitle("ネットワーク設定")
+            settingDialogComponent.value?.setItems([
+                {
+                    label: "ネットワーク名",
+                    id: "name",
+                    type: "string",
+                    defaultValue: comp.refdata.name
+                },
+                {
+                    label: "説明",
+                    id: "description",
+                    type: "string",
+                    defaultValue: comp.refdata.description
+                }
+            ])
+            settingDialogComponent.value?.show((result: any) => {
+                comp.refdata.name = result["name"]
+                comp.refdata.description = result["description"] == "" ? undefined : result["description"]
+                comp.save()
+            })
+        }
     }
 }
 

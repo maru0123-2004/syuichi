@@ -27,7 +27,7 @@ export class Machine {
     }
 
     async save() {
-        await MachinesService.machinesUpdate(this.refdata.container_id, {
+        await MachinesService.machinesPartialUpdate(this.refdata.id, {
             // name: this.refdata.name,
             // description: this.refdata.description,
             x: this.refdata.x,
