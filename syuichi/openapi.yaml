@@ -386,6 +386,78 @@ paths:
               schema:
                 $ref: '#/components/schemas/DettachNetwork'
           description: ''
+  /api/machines/{id}/dnsconfig/:
+    post:
+      operationId: machines_dnsconfig_create
+      description: API endpoint that allows machines to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this machine.
+        required: true
+      tags:
+      - machines
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Machine'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Machine'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Machine'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Machine'
+          description: ''
+  /api/machines/{id}/get_network/:
+    post:
+      operationId: machines_get_network_create
+      description: API endpoint that allows machines to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this machine.
+        required: true
+      tags:
+      - machines
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetNetwork'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GetNetwork'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GetNetwork'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetNetwork'
+          description: ''
   /api/networks/:
     get:
       operationId: networks_list
@@ -542,6 +614,26 @@ paths:
       - tokenAuth: []
       responses:
         '204':
+          description: No response body
+  /api/networks/{id}/available/:
+    get:
+      operationId: networks_available_retrieve
+      description: API endpoint that allows networks to be viewed or edited.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this network.
+        required: true
+      tags:
+      - networks
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
           description: No response body
   /api/token/:
     post:
@@ -734,7 +826,6 @@ components:
         ipaddr:
           type: string
       required:
-      - ipaddr
       - network_id
     AuthToken:
       type: object
@@ -753,6 +844,14 @@ components:
       - token
       - username
     DettachNetwork:
+      type: object
+      properties:
+        network_id:
+          type: string
+          format: uuid
+      required:
+      - network_id
+    GetNetwork:
       type: object
       properties:
         network_id:
@@ -791,6 +890,8 @@ components:
         description:
           type: string
           maxLength: 300
+        confdata:
+          readOnly: true
         x:
           type: integer
           maximum: 9223372036854775807
@@ -805,6 +906,7 @@ components:
           type: integer
           readOnly: true
       required:
+      - confdata
       - container_id
       - id
       - machine_type
@@ -896,6 +998,8 @@ components:
         description:
           type: string
           maxLength: 300
+        confdata:
+          readOnly: true
         x:
           type: integer
           maximum: 9223372036854775807

@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { AttachNetwork } from '../models/AttachNetwork';
 import type { DettachNetwork } from '../models/DettachNetwork';
+import type { GetNetwork } from '../models/GetNetwork';
 import type { Machine } from '../models/Machine';
 import type { PatchedMachine } from '../models/PatchedMachine';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -148,6 +149,48 @@ export class MachinesService {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/machines/{id}/dettach_network/',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+    /**
+     * API endpoint that allows machines to be viewed or edited.
+     * @param id A UUID string identifying this machine.
+     * @param requestBody
+     * @returns Machine
+     * @throws ApiError
+     */
+    public static machinesDnsconfigCreate(
+        id: string,
+        requestBody: Machine,
+    ): CancelablePromise<Machine> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/machines/{id}/dnsconfig/',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+    /**
+     * API endpoint that allows machines to be viewed or edited.
+     * @param id A UUID string identifying this machine.
+     * @param requestBody
+     * @returns GetNetwork
+     * @throws ApiError
+     */
+    public static machinesGetNetworkCreate(
+        id: string,
+        requestBody: GetNetwork,
+    ): CancelablePromise<GetNetwork> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/machines/{id}/get_network/',
             path: {
                 'id': id,
             },

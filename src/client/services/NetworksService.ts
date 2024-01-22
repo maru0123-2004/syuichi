@@ -111,4 +111,21 @@ export class NetworksService {
             },
         });
     }
+    /**
+     * API endpoint that allows networks to be viewed or edited.
+     * @param id A UUID string identifying this network.
+     * @returns any No response body
+     * @throws ApiError
+     */
+    public static networksAvailableRetrieve(
+        id: string,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/networks/{id}/available/',
+            path: {
+                'id': id,
+            },
+        });
+    }
 }

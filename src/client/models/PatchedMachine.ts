@@ -9,6 +9,7 @@ export type PatchedMachine = {
     machine_type?: MachineTypeEnum;
     name?: string;
     description?: string;
+    readonly confdata?: any;
     'x'?: number;
     'y'?: number;
     readonly owner?: number;

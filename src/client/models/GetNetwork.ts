@@ -2,8 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type AttachNetwork = {
+export type GetNetwork = {
     network_id: string;
-    ipaddr?: string;
 };
 
