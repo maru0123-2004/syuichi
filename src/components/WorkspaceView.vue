@@ -12,7 +12,9 @@
                 :network="getNetworkComponent(edge.value.networkId)"
                 :machine="getMachineComponent(edge.value.machineId)"
                 :mouse-x="mouseData.clientX"
-                :mouse-y="mouseData.clientY"/>
+                :mouse-y="mouseData.clientY"
+                @selected="onComponentSelected(networkEdges[index].value)"
+                @unselected="onComponentUnselected(networkEdges[index].value)" />
                 <ComponentMachine v-for="(machine, index) in machines" :key="machine.value.refdata.id" ref="machineComponents"
                 v-model="machines[index].value"
                 @selected="onComponentSelected(machines[index].value)"
@@ -44,7 +46,6 @@ import ComponentNetwork from './ComponentNetwork.vue'
 import ComponentNetworkEdge from './ComponentNetworkEdge.vue'
 import { checkAuthorized, loadFromCookie } from '@/utils/AuthUtils'
 import WorkspaceSettingDialog from './WorkspaceSettingDialog.vue'
-import { server, toEditorSettings } from 'typescript'
 
 type CompMachine = InstanceType<typeof ComponentMachine>
 type CompNetwork = InstanceType<typeof ComponentNetwork>
@@ -60,7 +61,7 @@ const networkComponents = ref(Array<CompNetwork>())
 const networkEdgeComponents = ref(Array<CompNetworkEdge>())
 const settingDialogComponent = ref<CompSettingDialog>()
 
-const selectedComponent = ref<Machine | Network>()
+const selectedComponent = ref<Machine | Network | NetworkEdge>()
 const machines = ref(new Array<Ref<Machine>>())
 const networks = ref(new Array<Ref<Network>>())
 const networkEdges = ref(new Array<Ref<NetworkEdge>>())
@@ -225,19 +226,32 @@ const onClickConnectNetwork = () => {
 const onClickDeleteComponent = () => {
     if(selectedComponent.value) {
         if(selectedComponent.value instanceof Machine) {
-            machines.value = machines.value.filter(x => x.value.refdata.id != selectedComponent.value?.refdata.id)
-            networkEdges.value = networkEdges.value.filter(x => x.value.machineId != selectedComponent.value?.refdata.id)
+            const comp = selectedComponent.value
+            machines.value = machines.value.filter(x => x.value.refdata.id != comp.refdata.id)
+            networkEdges.value = networkEdges.value.filter(x => x.value.machineId != comp.refdata.id)
+            comp.destroy()
         }
         else if(selectedComponent.value instanceof Network) {
-            networks.value = networks.value.filter(x => x.value.refdata.id != selectedComponent.value?.refdata.id)
-            networkEdges.value = networkEdges.value.filter(x => x.value.networkId != selectedComponent.value?.refdata.id)
+            const comp = selectedComponent.value
+            networks.value = networks.value.filter(x => x.value.refdata.id != comp.refdata.id)
+            networkEdges.value = networkEdges.value.filter(x => x.value.networkId != comp.refdata.id)
+            comp.destroy()
         }
-        selectedComponent.value.destroy()
+        else if(selectedComponent.value instanceof NetworkEdge) {
+            const networkId = selectedComponent.value.networkId ?? ""
+            const machineId = selectedComponent.value.machineId ?? ""
+            const network = networks.value.find(x => x.value.refdata.id == networkId)
+            const machine = machines.value.find(x => x.value.refdata.id == machineId)
+            if(network?.value && machine?.value) {
+                machine.value.detachNetwork(network.value)
+            }
+            networkEdges.value = networkEdges.value.filter(x => x.value.networkId != networkId && x.value.machineId != machineId)
+        }
         selectedComponent.value = undefined
     }
 }
 
-const onComponentSelected = (comp: Machine | Network) => {
+const onComponentSelected = (comp: Machine | Network | NetworkEdge) => {
     if(contextMenu.value == undefined || contextMenu.value.isShowing.value) {
         return
     }
@@ -245,7 +259,7 @@ const onComponentSelected = (comp: Machine | Network) => {
     selectedComponent.value.highlighted = true
 }
 
-const onComponentUnselected = (comp: Machine | Network) => {
+const onComponentUnselected = (comp: Machine | Network | NetworkEdge) => {
     if(contextMenu.value == undefined || contextMenu.value.isShowing.value) {
         return
     }
