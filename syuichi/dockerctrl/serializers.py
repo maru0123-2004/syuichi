@@ -13,20 +13,21 @@ class GroupSerializer(serializers.ModelSerializer):
         model = Group
         fields = ['url', 'name']
 
-import docker, docker.types, ipaddress
+import docker, docker.types, ipaddress, secrets
 docker_client = docker.from_env()
 
 class MachineSerializer(serializers.ModelSerializer):
     class Meta:
         model = Machine
         fields = '__all__'
-        read_only_fields = ['container_id', 'owner']
+        read_only_fields = ['container_id', 'owner', 'confdata']
     def create(self, data):
         machine_type=data["machine_type"]
+        kwargs={"detach":True, "publish_all_ports":True}
         if machine_type==Machine.MachineType.WEB_SERVER:
-            container=docker_client.containers.run("litespeedtech/litespeed:latest", name=data["name"], detach=True)
+            container=docker_client.containers.run("litespeedtech/openlitespeed:latest", **kwargs)
         elif machine_type==Machine.MachineType.DNS_SERVER:
-            container=docker_client.containers.run("powerdns/pdns-auth-48:latest", name=data["name"], detach=True)
+            container=docker_client.containers.run("powerdns/pdns-auth-48:latest", **kwargs)
         else:
             raise ValueError
         machine=Machine(**data, container_id=str(container.id), owner=self.context["request"].user)
@@ -47,7 +48,7 @@ class NetworkSerializer(serializers.ModelSerializer):
                 gateway=gateway
             )
         ])
-        network=docker_client.networks.create(name=data["name"], enable_ipv6=data["network"].version==6, driver="bridge", ipam=ipam_config)
+        network=docker_client.networks.create(name=secrets.token_hex(20), enable_ipv6=data["network"].version==6, driver="bridge", ipam=ipam_config)
         network=Network(**data, network_id=str(network.id), owner=self.context["request"].user, gateway=gateway)
         network.save()
         return network
@@ -55,5 +56,8 @@ class NetworkSerializer(serializers.ModelSerializer):
 class DettachNetworkSerializer(serializers.Serializer):
     network_id=serializers.PrimaryKeyRelatedField(queryset=Network.objects.all())
 
+class GetNetworkSerializer(DettachNetworkSerializer):
+    pass
+
 class AttachNetworkSerializer(DettachNetworkSerializer):
-    ipaddr=serializers.IPAddressField()
+    ipaddr=serializers.IPAddressField(required=False, default=None)

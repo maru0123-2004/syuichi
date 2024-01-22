@@ -14,6 +14,7 @@ class Machine(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=300, default='')
     owner = models.ForeignKey(User, related_name='machines', on_delete=models.CASCADE)
+    confdata = models.JSONField(default=dict)
     x = models.BigIntegerField(default=0)
     y = models.BigIntegerField(default=0)
 

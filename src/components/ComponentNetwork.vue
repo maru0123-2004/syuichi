@@ -12,6 +12,11 @@
             strokeWidth: 3
         }"></v-circle>
         <v-text :config="{
+            fontFamily: 'Material Design Icons',
+            fontSize: SIZE*0.95,
+            text: String.fromCodePoint(components['NETWORK'].iconCode)
+        }"></v-text>
+        <v-text :config="{
             x: -50 + SIZE / 2,
             y: SIZE + 10,
             width: 100,
@@ -32,6 +37,7 @@
 <script lang="ts" setup>
 import { computed, readonly } from 'vue';
 import { Network } from '../models/Network'
+import { components } from '@/const';
 
 const model = defineModel<Network>({ required: true })
 

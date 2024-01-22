@@ -10,6 +10,7 @@ export type { OpenAPIConfig } from './core/OpenAPI';
 export type { AttachNetwork } from './models/AttachNetwork';
 export type { AuthToken } from './models/AuthToken';
 export type { DettachNetwork } from './models/DettachNetwork';
+export type { GetNetwork } from './models/GetNetwork';
 export type { Group } from './models/Group';
 export type { Machine } from './models/Machine';
 export { MachineTypeEnum } from './models/MachineTypeEnum';

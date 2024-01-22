@@ -1,18 +1,16 @@
 <template>
-    <div id="tab">
-        <div id="server" draggable="true" :data-type="MachineTypeEnum.WEB" 
-        @dragstart="onDragStart" @dragend="onDragEnd"></div>
-        <div id="server" draggable="true" :data-type="MachineTypeEnum.DNS" 
-        @dragstart="onDragStart" @dragend="onDragEnd"></div>
-        <div id="server" draggable="true" :data-type="MachineTypeEnum.SMTP" 
-        @dragstart="onDragStart" @dragend="onDragEnd"></div>
-        <div id="network" draggable="true" data-type="NETWORK" 
-        @dragstart="onDragStart" @dragend="onDragEnd"></div>
+    <div class="tabs" >
+        <v-tooltip :text="tab.name" location="bottom" v-for="(tab, index) in tabs" :key="index">
+            <template v-slot:activator="{ props }">
+                <v-icon class="tab" v-bind="props" draggable="true" :data-type="index"
+                :icon="tab.icon" @dragstart="onDragStart" @dragend="onDragEnd"></v-icon>
+            </template>
+        </v-tooltip>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { MachineTypeEnum } from '@/client'
+import {components as tabs} from '@/const';
 
 const onDragStart = (e: DragEvent) => {
     const el = e.target as HTMLElement | null
@@ -32,7 +30,7 @@ const onDragEnd = (e: DragEvent) => {
 </script>
 
 <style scoped>
-#tab {
+.tabs {
     width: 100%;
     height: 100%;
     display: flex;
@@ -40,17 +38,10 @@ const onDragEnd = (e: DragEvent) => {
     box-sizing: border-box;
 }
 
-#server {
+.tab {
     width: 64px;
     height: 64px;
-    background: black;
     margin: 20px;
-}
-
-#network {
-    width: 64px;
-    height: 64px;
-    background: skyblue;
-    margin: 20px;
+    font-size: 64px;
 }
 </style>
