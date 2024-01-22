@@ -10,8 +10,8 @@
                 <ComponentNetworkEdge v-for="(edge, index) in networkEdges" :key="index" ref="networkEdgeComponents"
                 :network="getNetworkComponent(edge.value.networkId)"
                 :machine="getMachineComponent(edge.value.machineId)"
-                :mouse-x="mouseX"
-                :mouse-y="mouseY"/>
+                :mouse-x="mouseData.clientX"
+                :mouse-y="mouseData.clientY"/>
                 <ComponentMachine v-for="(machine, index) in machines" :key="machine.value.refdata.id" ref="machineComponents"
                 v-model="machines[index].value"
                 @selected="onComponentSelected(machines[index].value)"
@@ -28,7 +28,7 @@
 
 <script lang="ts" setup>
 import { reactive, computed, ref, Ref, onMounted } from 'vue'
-import { Machine, MachineType } from '../models/Machine'
+import { Machine } from '../models/Machine'
 import { Network } from '../models/Network'
 import { NetworkEdge } from '../models/NetworkEdge'
 
@@ -36,6 +36,8 @@ import ContextMenu from './ContextMenu.vue'
 import ComponentMachine from './ComponentMachine.vue'
 import ComponentNetwork from './ComponentNetwork.vue'
 import ComponentNetworkEdge from './ComponentNetworkEdge.vue'
+import { MachineTypeEnum, OpenAPI } from '@/client'
+import router from '@/router'
 
 type CompMachine = InstanceType<typeof ComponentMachine>
 type CompNetwork = InstanceType<typeof ComponentNetwork>
@@ -55,8 +57,13 @@ const machines = ref(new Array<Ref<Machine>>())
 const networks = ref(new Array<Ref<Network>>())
 const networkEdges = ref(new Array<Ref<NetworkEdge>>())
 const connectingNetworkEdge = ref<NetworkEdge>()
-const mouseX = ref(0)
-const mouseY = ref(0)
+const mouseData = ref({
+    offsetX: 0,
+    offsetY: 0,
+    clientX: 0,
+    clientY: 0
+})
+
 const stageConfig = ref({
     width: view.value?.clientWidth,
     height: view.value?.clientHeight
@@ -71,13 +78,13 @@ onMounted(() => {
     if (view.value){
         resizeObserver.observe(view.value)
     }
-})
 
-function getServerId(serverType: string) {
-    const id = machineCount.get(serverType) ?? 1
-    machineCount.set(serverType, id + 1)
-    return id
-}
+    if(!OpenAPI.HEADERS || !("Authorization" in OpenAPI.HEADERS)) {
+        router.push("/")
+    }
+
+    loadWorkspace()
+})
 
 const onDragOver = (e: DragEvent) => {
     e.preventDefault()
@@ -91,7 +98,8 @@ const onDrop = (e: DragEvent) => {
     }
 
     if(serverType == "NETWORK") {
-        Network.create("192.168." + networkCount.value + ".0/24", "Network " + networkCount.value).then((network) => {
+        const network = findUnusedNetworkAddress()
+        Network.create(network, "Network " + network).then((network) => {
             network.x = e.clientX - 25
             network.y = e.clientY - 25
             networks.value.push(ref(network))
@@ -99,8 +107,10 @@ const onDrop = (e: DragEvent) => {
         })
     }
     else {
-        const machineType = MachineType.WEB
-        Machine.create(machineType, "WEB Server " + getServerId("WEB")).then((machine) => {
+        const type = MachineTypeEnum.WEB
+        const name = findMachineName(type)
+        console.log(type, name)
+        Machine.create(type, name).then((machine) => {
             machine.x = e.clientX - 25
             machine.y = e.clientY - 25
             machines.value.push(ref(machine))
@@ -111,13 +121,15 @@ const onDrop = (e: DragEvent) => {
 const onContextMenu = (e: MouseEvent) => {
     e.preventDefault()
     if(selectedComponent.value != undefined) {
-        contextMenu.value?.show(e)
+        contextMenu.value?.show(mouseData.value.clientX, mouseData.value.clientY, view.value)
     }
 }
 
 const onMouseMove = (e: MouseEvent) => {
-    mouseX.value = e.offsetX
-    mouseY.value = e.offsetY
+    mouseData.value.offsetX = e.offsetX
+    mouseData.value.offsetY = e.offsetY
+    mouseData.value.clientX = e.clientX
+    mouseData.value.clientY = e.clientY
 }
 
 const onClickConnectNetwork = () => {
@@ -144,13 +156,13 @@ const onClickDeleteComponent = () => {
         if(selectedComponent.value instanceof Machine) {
             machines.value = machines.value.filter(x => x.value.refdata.id != selectedComponent.value?.refdata.id)
             networkEdges.value = networkEdges.value.filter(x => x.value.machineId != selectedComponent.value?.refdata.id)
-            selectedComponent.value.destroy()
         }
         else if(selectedComponent.value instanceof Network) {
             networks.value = networks.value.filter(x => x.value.refdata.id != selectedComponent.value?.refdata.id)
             networkEdges.value = networkEdges.value.filter(x => x.value.networkId != selectedComponent.value?.refdata.id)
-            selectedComponent.value.destroy()
         }
+        selectedComponent.value.destroy()
+        selectedComponent.value = undefined
     }
 }
 
@@ -175,13 +187,29 @@ const onClickStage = (e: MouseEvent) => {
         if(connectingNetworkEdge.value && selectedComponent.value ) {
             if(connectingNetworkEdge.value.machineId && selectedComponent.value instanceof Network) {
                 connectingNetworkEdge.value.networkId = selectedComponent.value.refdata.id
+                attachNetwork(
+                    connectingNetworkEdge.value.machineId,
+                    connectingNetworkEdge.value.networkId
+                )
                 connectingNetworkEdge.value = undefined
             }
             else if(connectingNetworkEdge.value.networkId && selectedComponent.value instanceof Machine) {
                 connectingNetworkEdge.value.machineId = selectedComponent.value.refdata.id
+                attachNetwork(
+                    connectingNetworkEdge.value.machineId,
+                    connectingNetworkEdge.value.networkId
+                )
                 connectingNetworkEdge.value = undefined
             }
         }
+    }
+}
+
+const attachNetwork = (machineId?: string, networkId?: string) => {
+    const machine = machines.value.find(x => x.value.refdata.id == machineId)
+    const network = networks.value.find(x => x.value.refdata.id == networkId)
+    if(machine && network && !network?.value.refdata.machines.includes(machine.value.refdata.id)) {
+        machine?.value.attachNetwork(network?.value, "")
     }
 }
 
@@ -219,6 +247,46 @@ const menu = reactive([
 
 const focus = () => {
     view.value?.focus()
+}
+
+const loadWorkspace = async () => {
+    Machine.list().then((fetchedMachines) => {
+        fetchedMachines.forEach((machine) => {
+            machines.value.push(ref(machine))
+        })
+    })
+    Network.list().then((fetchedNetworks) => {
+        fetchedNetworks.forEach((network) => {
+            networks.value.push(ref(network))
+        })
+    })
+}
+
+const findMachineName = (type: MachineTypeEnum) => {
+    let i = 1
+    do {
+        const nameCandidate = type + "_Server_" + i
+        if(machines.value.every((machine) => {
+            return nameCandidate != machine.value.refdata.name
+        })) {
+            return nameCandidate
+        }
+
+        i++
+    }
+    while(true)
+}
+
+const findUnusedNetworkAddress = () => {
+    let i = 1
+    while(true) {
+        const addressCandidate = "192.168." + i + ".0/24"
+        if(networks.value.every(network => addressCandidate != network.value.refdata.network)) {
+            return addressCandidate
+        }
+
+        i++
+    }
 }
 
 </script>

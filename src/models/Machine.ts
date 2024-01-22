@@ -1,9 +1,6 @@
 import { Machine as MachineAPI, MachineTypeEnum as MachineTypeEnumAPI, MachinesService } from "@/client"
 import { Network } from "./Network"
 
-export type MachineTypeEnum = MachineTypeEnumAPI
-export const MachineType = MachineTypeEnumAPI
-
 export class Machine {
     refdata: MachineAPI
 
@@ -32,7 +29,7 @@ export class Machine {
         })
     }
 
-    static async create(type: MachineTypeEnum, name: string, description?: string) {
+    static async create(type: MachineTypeEnumAPI, name: string, description?: string) {
         const machineApi = await MachinesService.machinesCreate({
             id: "",
             container_id: "",
