@@ -4,11 +4,13 @@
     @mouseleave="$emit('unselected')"
     @dragmove="onDragMove"
     @dragend="onDragEnd">
-        <v-rect :config="{
+        <v-text :config="{
             width: SIZE,
             height: SIZE,
-            fill: 'black'
-        }"></v-rect>
+            fontFamily: 'Material Design Icons',
+            fontSize: SIZE,
+            text: String.fromCodePoint(components[model.refdata.machine_type].iconCode)
+        }"></v-text>
         <v-text :config="{
             x: 0,
             y: SIZE + 10,
@@ -31,6 +33,7 @@
 import { computed } from 'vue'
 import { Machine } from '../models/Machine'
 import { readonly } from 'vue';
+import { components } from '@/const';
 
 const model = defineModel<Machine>({ required: true })
 

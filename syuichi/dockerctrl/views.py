@@ -96,7 +96,12 @@ class MachineViewSet(viewsets.ModelViewSet):
         network.save()
         docker_client.networks.get(network.network_id).disconnect(machine.container_id, force=True)
         return Response("success", status=200)
-
+    @action(detail=True, methods=["post"], url_name="dnsconfig")
+    def dnsconfig(self, request, pk=None):
+        machine=Machine.objects.get(id=pk)
+        if machine.owner!=request.user:
+            return Response("error: permission denied", status=403)
+        
 
 class NetworkViewSet(viewsets.ModelViewSet):
     """
