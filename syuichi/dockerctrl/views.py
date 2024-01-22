@@ -87,7 +87,6 @@ class MachineViewSet(viewsets.ModelViewSet):
             return Response("error: permission denied", status=403)
         network=Network.objects.get(id=request.data["network_id"])
         if not request.data.get("ipaddr", None):
-            print(get_available_network(network.id))
             request.data["ipaddr"]=get_available_network(network.id)[0]
         port=Port(ip_addr=request.data["ipaddr"], network=network, machine=machine)
         port.save()
