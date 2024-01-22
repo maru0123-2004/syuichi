@@ -44,6 +44,14 @@ class GroupViewSet(viewsets.ModelViewSet):
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+def get_available_network(network_id):
+    network=Network.objects.get(id=network_id)
+    network_addr=ipaddress.ip_network(network.network)
+    hosts=list(map(str, network_addr.hosts()))
+    used_hosts=map(lambda p:p.ip_addr, Port.objects.filter(network=network))
+    for used_host in used_hosts: hosts.remove(used_host)
+    return Response(hosts, status=200)
+
 class MachineViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows machines to be viewed or edited.
@@ -141,3 +149,6 @@ class NetworkViewSet(viewsets.ModelViewSet):
             return super().destroy(request, *args, **kwargs)
         else:
             return Response("error: permission denied", status=403)
+    @action(detail=True, methods=["get"], url_name="dnsconfig", serializer_class=serializers.Serializer)
+    def available(self, request, pk=None):
+        return get_available_network(pk)
