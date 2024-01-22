@@ -27,7 +27,10 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, computed, ref, Ref, onMounted } from 'vue'
+import { reactive, ref, Ref, onMounted } from 'vue'
+import router from '@/router'
+import { MachineTypeEnum, OpenAPI } from '@/client'
+
 import { Machine } from '../models/Machine'
 import { Network } from '../models/Network'
 import { NetworkEdge } from '../models/NetworkEdge'
@@ -36,8 +39,7 @@ import ContextMenu from './ContextMenu.vue'
 import ComponentMachine from './ComponentMachine.vue'
 import ComponentNetwork from './ComponentNetwork.vue'
 import ComponentNetworkEdge from './ComponentNetworkEdge.vue'
-import { MachineTypeEnum, OpenAPI } from '@/client'
-import router from '@/router'
+import { checkAuthorized, loadFromCookie } from '@/utils/AuthUtils'
 
 type CompMachine = InstanceType<typeof ComponentMachine>
 type CompNetwork = InstanceType<typeof ComponentNetwork>
@@ -50,9 +52,7 @@ const machineComponents = ref(Array<CompMachine>())
 const networkComponents = ref(Array<CompNetwork>())
 const networkEdgeComponents = ref(Array<CompNetworkEdge>())
 
-const networkCount = ref(1);
 const selectedComponent = ref<Machine | Network>()
-const machineCount = new Map<string, number>()
 const machines = ref(new Array<Ref<Machine>>())
 const networks = ref(new Array<Ref<Network>>())
 const networkEdges = ref(new Array<Ref<NetworkEdge>>())
@@ -69,7 +69,7 @@ const stageConfig = ref({
     height: view.value?.clientHeight
 })
 
-onMounted(() => {
+onMounted(async () => {
     focus()
     const resizeObserver = new ResizeObserver(()=>{
         stageConfig.value.height = view.value?.clientHeight
@@ -79,7 +79,7 @@ onMounted(() => {
         resizeObserver.observe(view.value)
     }
 
-    if(!OpenAPI.HEADERS || !("Authorization" in OpenAPI.HEADERS)) {
+    if(await loadFromCookie() && await checkAuthorized()) {
         router.push("/")
     }
 
@@ -103,11 +103,14 @@ const onDrop = (e: DragEvent) => {
             network.x = e.clientX - 25
             network.y = e.clientY - 25
             networks.value.push(ref(network))
-            networkCount.value++
         })
     }
-    else {
-        const type = MachineTypeEnum.WEB
+    else if(
+        serverType == MachineTypeEnum.WEB ||
+        serverType == MachineTypeEnum.DNS ||
+        serverType == MachineTypeEnum.SMTP
+    ) {
+        const type = serverType as MachineTypeEnum
         const name = findMachineName(type)
         console.log(type, name)
         Machine.create(type, name).then((machine) => {
@@ -250,16 +253,23 @@ const focus = () => {
 }
 
 const loadWorkspace = async () => {
-    Machine.list().then((fetchedMachines) => {
+    const machinePromise = Machine.list().then((fetchedMachines) => {
         fetchedMachines.forEach((machine) => {
             machines.value.push(ref(machine))
         })
     })
-    Network.list().then((fetchedNetworks) => {
+    const networkPromise = Network.list().then(async (fetchedNetworks) => {
         fetchedNetworks.forEach((network) => {
             networks.value.push(ref(network))
         })
+        await machinePromise
+        fetchedNetworks.forEach((network) => {
+            network.getEdges().forEach((edge) => {
+                networkEdges.value.push(ref(edge))
+            })
+        })
     })
+    await Promise.all([machinePromise, networkPromise])
 }
 
 const findMachineName = (type: MachineTypeEnum) => {

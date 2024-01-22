@@ -29,6 +29,7 @@ import { MachinesService, OpenAPI, TokenService } from '@/client';
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { SubmitEventPromise } from 'vuetify/lib/framework.mjs';
+import { loadFromCookie, saveToCookie, checkAuthorized} from '../utils/AuthUtils'
 
 const router=useRouter()
 
@@ -37,10 +38,13 @@ const username = ref("")
 const passwd = ref("")
 
 onMounted(async ()=>{
-    if ("Authorization" in (OpenAPI.HEADERS??{})){
-        if(OpenAPI.HEADERS??{Authorization:''}.Authorization){
-            router.push("Workspace")
-        }
+    // if ("Authorization" in (OpenAPI.HEADERS??{})){
+    //     if(OpenAPI.HEADERS??{Authorization:''}.Authorization){
+    //         router.push("Workspace")
+    //     }
+    // }
+    if(await loadFromCookie() && await checkAuthorized()) {
+        return router.push("Workspace")
     }
 })
 
@@ -61,7 +65,8 @@ const onSubmit = async (e:SubmitEventPromise) => {
         password: passwd.value,
         token: crypto.randomUUID().toString()
     })
-    OpenAPI.HEADERS={Authorization: `Token ${token.token}`}
+    
+    saveToCookie(token.token)
     router.push("Workspace")
 }
 </script>

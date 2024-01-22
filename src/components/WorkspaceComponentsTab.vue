@@ -1,13 +1,19 @@
 <template>
     <div id="tab">
-        <div id="server" draggable="true" data-type="HTML" @dragstart="onDragStart" @dragend="onDragEnd"></div>
-        <div id="server" draggable="true" data-type="DNS" @dragstart="onDragStart" @dragend="onDragEnd"></div>
-        <div id="server" draggable="true" data-type="FILE" @dragstart="onDragStart" @dragend="onDragEnd"></div>
-        <div id="network" draggable="true" data-type="NETWORK" @dragstart="onDragStart" @dragend="onDragEnd"></div>
+        <div id="server" draggable="true" :data-type="MachineTypeEnum.WEB" 
+        @dragstart="onDragStart" @dragend="onDragEnd"></div>
+        <div id="server" draggable="true" :data-type="MachineTypeEnum.DNS" 
+        @dragstart="onDragStart" @dragend="onDragEnd"></div>
+        <div id="server" draggable="true" :data-type="MachineTypeEnum.SMTP" 
+        @dragstart="onDragStart" @dragend="onDragEnd"></div>
+        <div id="network" draggable="true" data-type="NETWORK" 
+        @dragstart="onDragStart" @dragend="onDragEnd"></div>
     </div>
 </template>
 
 <script lang="ts" setup>
+import { MachineTypeEnum } from '@/client'
+
 const onDragStart = (e: DragEvent) => {
     const el = e.target as HTMLElement | null
     const serverType = el?.dataset.type
