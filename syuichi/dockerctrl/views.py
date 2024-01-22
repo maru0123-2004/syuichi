@@ -21,7 +21,7 @@ from django.contrib.auth.models import Group, User
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 
-import docker, ipaddress
+import docker, ipaddress, docker.errors
 docker_client = docker.from_env()
 
 from .serializers import *
@@ -78,12 +78,26 @@ class MachineViewSet(viewsets.ModelViewSet):
         if machine.owner!=request.user:
             return Response("error: permission denied", status=403)
         network=Network.objects.get(id=request.data["network_id"])
-        Port(ip_addr=request.data["ipaddr"], network=network, machine=machine).save()
+        port=Port(ip_addr=request.data["ipaddr"], network=network, machine=machine)
+        port.save()
         ip_version=ipaddress.ip_address(request.data["ipaddr"]).version
-        docker_client.networks.get(network.network_id).connect(machine.container_id,
+        try: docker_client.networks.get(network.network_id).connect(machine.container_id,
                                                                ipv4_address=request.data["ipaddr"] if ip_version == 4 else None,
                                                                ipv6_address=request.data["ipaddr"] if ip_version == 6 else None)
-        return Response("success", status=200)
+        except docker.errors.APIError as e:
+            port.delete()
+            print(e)
+            return Response("error", status=500)
+        else:
+            return Response("success", status=200)
+    @action(detail=True, methods=['post'], url_name="get_network", serializer_class=GetNetworkSerializer)
+    def get_network(self, request, pk=None):
+        if "network_id" not in request.data:
+            return Response("error: network_id is not given", status=400)
+        machine=Machine.objects.get(id=pk)
+        if machine.owner!=request.user:
+            return Response("error: permission denied", status=403)
+        return Response(Port.objects.get(machine=machine, network=request.data["network_id"]).ip_addr, status=200)
     @action(detail=True, methods=['post'], url_name="dettach_network", serializer_class=DettachNetworkSerializer)
     def dettach_network(self, request, pk=None):
         if "network_id" not in request.data:

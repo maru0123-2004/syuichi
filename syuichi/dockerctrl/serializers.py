@@ -56,5 +56,8 @@ class NetworkSerializer(serializers.ModelSerializer):
 class DettachNetworkSerializer(serializers.Serializer):
     network_id=serializers.PrimaryKeyRelatedField(queryset=Network.objects.all())
 
+class GetNetworkSerializer(DettachNetworkSerializer):
+    pass
+
 class AttachNetworkSerializer(DettachNetworkSerializer):
-    ipaddr=serializers.IPAddressField()
+    ipaddr=serializers.IPAddressField(required=False, default=None)
